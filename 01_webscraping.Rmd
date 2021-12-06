@@ -9,11 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+## Packages
 
 ```{r}
 library(tidyverse)
@@ -24,28 +20,26 @@ library(quanteda)
 ```
 <br>
 
-###Part 1 - Scraping headlines by date 
+## Part 1 - Scraping headlines by date 
 
 what i did until now: 
  - create a list of all guardian pages within the chosen period (18 octr to 28 nov) (RMK:first/last page is with dates also before after 28 nov/18 oct but we can remove them in the cleaning part)
  - try to download pages from list of urls(pages_list) and store them in a dataframe
 ```{r}
-guardian <- read_html("https://www.theguardian.com/environment/cop26-glasgow-climate-change-conference-2021?page=1")
-
 baseurl <- "https://www.theguardian.com/environment/cop26-glasgow-climate-change-conference-2021?page="
 pageurl <- paste0(seq(1, 33, 1))
 pages_list <- paste0(baseurl, pageurl)
-pages_list[1:5] #33 pages until 18 oct = 2 weeks before cop --> I LOOKED AT IT BY HAND, IS THERE A WAY TO LOOK INTO IT AUTOMATICALLY (NOT URGENT)?
+pages_list[1:5] #33 pages until 18 oct = 2 weeks before cop --> I LOOKED AT IT BY HAND, IS THERE A WAY TO LOOK INTO IT AUTOMATICALLY? (NOT URGENT)
 
-#PROBLEM: the urls in the list are characters, so the loop doesn't recognize them. is there a way to make the loop select what's inside the " "? 
+#PROBLEM: the urls in the list are characters, so the loop doesn't recognize them. is there a way to make the loop select what's inside the " "? /another way could be download urls in the folder and then extract info from those files 
 
 ourdf <- data.frame()
 for (i in 1:length(pages_list))  { if (!file.exists(paste0(ourdf, pages_list[i]))) {
+  
   html_nodes('body') %>% 
   xml_find_all('//*[contains(concat( " ", @class, " " ), concat( " ", "fc-date-headline", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "js-headline-text", " " ))]') %>%
   xml_text()
 }}
-
 
 
 #tryCatch(download.file(pages_list[i], destfile = paste0(ourdf, pages_list[i])))
@@ -55,25 +49,19 @@ for (i in 1:length(pages_list))  { if (!file.exists(paste0(ourdf, pages_list[i])
 ```
 <br>
 
-parts copypasted from assignment 3 + xpaths of dates + headlines
+### code for taking headlines + dates and transforming them in text
 ```{r}
+guardian <- read_html("https://www.theguardian.com/environment/cop26-glasgow-climate-change-conference-2021?page=1")
+
 headlines <- guardian %>% 
   html_nodes('body') %>% 
   xml_find_all('//*[contains(concat( " ", @class, " " ), concat( " ", "fc-date-headline", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "js-headline-text", " " ))]') %>%
   xml_text()
 
 #DATE CLASS //*[contains(concat( " ", @class, " " ), concat( " ", "fc-date-headline", " " ))]
-#CONTAINER CLASS //*[contains(concat( " ", @class, " " ), concat( " ", "fc-container__inner", " " ))]
 
-head(headlines, 42)
+head(headlines, 20)
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Note that the `echo = FALSE` parameter is added to the code chunk to prevent printing of the R code that generated the plot.
