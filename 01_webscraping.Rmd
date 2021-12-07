@@ -34,8 +34,9 @@ pages_list[1:5] #33 pages until 18 oct = 2 weeks before cop --> I LOOKED AT IT B
 #PROBLEM: the urls in the list are characters, so the loop doesn't recognize them. is there a way to make the loop select what's inside the " "? /another way could be download urls in the folder and then extract info from those files 
 
 ourdf <- data.frame()
-for (i in 1:length(pages_list))  { if (!file.exists(paste0(ourdf, pages_list[i]))) {
-  
+for (i in 1:length(pages_list))  {
+  if (file.exists(paste0(ourdf, pages_list[i]))) {
+  read_html(pages_list[i]) %>%
   html_nodes('body') %>% 
   xml_find_all('//*[contains(concat( " ", @class, " " ), concat( " ", "fc-date-headline", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "js-headline-text", " " ))]') %>%
   xml_text()
@@ -51,7 +52,7 @@ for (i in 1:length(pages_list))  { if (!file.exists(paste0(ourdf, pages_list[i])
 
 ### code for taking headlines + dates and transforming them in text
 ```{r}
-guardian <- read_html("https://www.theguardian.com/environment/cop26-glasgow-climate-change-conference-2021?page=1")
+guardian <- read_html("https://www.theguardian.com/environment/cop26-glasgow-climate-change-conference-2021?page=4")
 
 headlines <- guardian %>% 
   html_nodes('body') %>% 
