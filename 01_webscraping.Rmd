@@ -26,26 +26,54 @@ what i did until now:
  - create a list of all guardian pages within the chosen period (18 octr to 28 nov) (RMK:first/last page is with dates also before after 28 nov/18 oct but we can remove them in the cleaning part)
  - try to download pages from list of urls(pages_list) and store them in a dataframe
 ```{r}
+################################################################################
+
 baseurl <- "https://www.theguardian.com/environment/cop26-glasgow-climate-change-conference-2021?page="
 pageurl <- paste0(seq(1, 33, 1))
 pages_list <- paste0(baseurl, pageurl)
 pages_list[1:5] #33 pages until 18 oct = 2 weeks before cop --> I LOOKED AT IT BY HAND, IS THERE A WAY TO LOOK INTO IT AUTOMATICALLY? (NOT URGENT)
+headlineslist <- c()
+dateslist <- c()
 
-#PROBLEM: the urls in the list are characters, so the loop doesn't recognize them. is there a way to make the loop select what's inside the " "? /another way could be download urls in the folder and then extract info from those files 
+#all_headlines = list()
+for (page in pages_list){
+  url_parsed <- read_html(page)
+  
+  headings_nodes <- html_elements(url_parsed, xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "fc-date-headline", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "js-headline-text", " " ))]')
+  
+  headlines <- html_text2(headings_nodes)
+  headlineslist <- append(headlineslist, headlines)
+  #all_headlines <- append(all_headlines, headlineslist)
+}
 
-ourdf <- data.frame()
-for (i in 1:length(pages_list))  {
-  if (file.exists(paste0(ourdf, pages_list[i]))) {
-  read_html(pages_list[i]) %>%
-  html_nodes('body') %>% 
-  xml_find_all('//*[contains(concat( " ", @class, " " ), concat( " ", "fc-date-headline", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "js-headline-text", " " ))]') %>%
-  xml_text()
-}}
+headlineslist <- unique(headlineslist)
 
 
-#tryCatch(download.file(pages_list[i], destfile = paste0(ourdf, pages_list[i])))
-#      Sys.sleep(runif(1, 2, 7)) 
+# maybe we can take these out, we don't use "dates" in the for loop anymore
+#oct <- grep("October", headlineslist)
+#nov <- grep("November", headlineslist)
+#dec <- grep("December", headlineslist)
+#dates <- append(oct, nov) %>% append(dec)
 
+# We iterate over the length of headlineslist, if we detect a match of "2021" in the headlineslist we recognise it as a date, and copy it into our dateslist. Note we keep the same position the date had in headlines. In the case were we don't find a date in the headlineslist, we fill the spot in dateslist with the previous entry (dateslist[i] <- dateslist[i-1]).
+for (i in 1:length(headlineslist)){
+  if(grepl("2021", headlineslist[i]) == TRUE){
+    dateslist[i] <- headlineslist[i]
+  }
+  else if (grepl("2021", headlineslist[i]) == FALSE) {
+    dateslist[i] <- dateslist[(i-1)]
+  }
+}
+
+# First combining both our lists into a dataframe, such that each headline is associated with a date, and then removing all rows in which headlines = dates since we no longer need these for reference.  
+
+cop26 <- cbind(as.data.frame(headlineslist), as.data.frame(dateslist)) %>% 
+  filter(headlineslist != dateslist) %>% 
+  rename("Headlines" = "headlineslist", "Dates" = "dateslist")
+View(cop26)
+
+
+################################################################################
 
 ```
 <br>
