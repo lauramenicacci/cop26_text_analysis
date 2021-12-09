@@ -17,6 +17,7 @@ library(rvest)
 library(stringr)
 library(xml2)
 library(quanteda)
+library(tidytext)
 ```
 <br>
 
@@ -94,3 +95,53 @@ head(headlines, 20)
 
 
 Note that the `echo = FALSE` parameter is added to the code chunk to prevent printing of the R code that generated the plot.
+
+# cleaning dates and headlines
+```{r}
+
+cop26 <- cbind(as.data.frame(headlineslist), as.data.frame(dateslist)) %>% 
+  filter(headlineslist != dateslist) %>% 
+  rename("Headlines" = "headlineslist", "Dates" = "dateslist")
+#formatting dates, will try to edit manually or import actual dates for the nonfomratted lines later, I copied the chunk above to run it for testing the format changes
+cop26$Dates<- as.Date(cop26$Dates , format = "%d %B %Y")#Dates of October disappeared, although it is the very same format, any idea?
+
+
+
+customized_stopwords<- add_row(stop_words, word="cop26", lexicon="customized_stopwrods")
+customized_stopwords<- add_row(customized_stopwords , word="glasgow", lexicon="customized_stopwords")
+customized_stopwords<- add_row(customized_stopwords , word="climate", lexicon="customized_stopwords")
+customized_stopwords<- add_row(customized_stopwords , word="change", lexicon="customized_stopwords")
+
+words_list<- cop26 %>% 
+  unnest_tokens(word,Headlines) %>% 
+  anti_join(customized_stopwords) %>% 
+  arrange(Dates)
+
+
+
+#Another way to do the same as above, the difference in the below is that we deal with all headlines as if they are one text, could be useful or not, let's see  
+#
+#concatenation of headlines in one text
+#all_headlines<- as.character(cop26 %>% 
+ # summarise( all_headlines = paste(Headlines, collapse = " ")))
+#headlines1<- data.frame(words = cop26$Headlines,stringsAsFactors = F)
+#unnesting
+#unnested1 <- headlines1 %>%
+ # unnest_tokens(word,words,strip_punct = FALSE)
+
+
+#Filter
+#filtered<-unnested1[!(unnested1$word %in% customized_stopwords),] 
+
+
+```
+
+
+
+
+
+
+
+
+
+
