@@ -18,6 +18,7 @@ library(stringr)
 library(xml2)
 library(quanteda)
 library(tidytext)
+library(lubridate)
 ```
 <br>
 
@@ -51,9 +52,9 @@ headlineslist <- unique(headlineslist)
 
 
 # maybe we can take these out, we don't use "dates" in the for loop anymore
-#oct <- grep("October", headlineslist)
-#nov <- grep("November", headlineslist)
-#dec <- grep("December", headlineslist)
+oct <- grep("October", headlineslist)
+nov <- grep("November", headlineslist)
+dec <- grep("December", headlineslist)
 #dates <- append(oct, nov) %>% append(dec)
 
 # We iterate over the length of headlineslist, if we detect a match of "2021" in the headlineslist we recognise it as a date, and copy it into our dateslist. Note we keep the same position the date had in headlines. In the case were we don't find a date in the headlineslist, we fill the spot in dateslist with the previous entry (dateslist[i] <- dateslist[i-1]).
@@ -103,8 +104,7 @@ cop26 <- cbind(as.data.frame(headlineslist), as.data.frame(dateslist)) %>%
   filter(headlineslist != dateslist) %>% 
   rename("Headlines" = "headlineslist", "Dates" = "dateslist")
 #formatting dates, will try to edit manually or import actual dates for the nonfomratted lines later, I copied the chunk above to run it for testing the format changes
-cop26$Dates<- as.Date(cop26$Dates , format = "%d %B %Y")#Dates of October disappeared, although it is the very same format, any idea?
-
+cop26$Dates<- as.Date(dmy(cop26$Dates) , format = "%d %B %Y")
 
 
 customized_stopwords<- add_row(stop_words, word="cop26", lexicon="customized_stopwrods")
