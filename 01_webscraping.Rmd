@@ -126,7 +126,18 @@ sentiment_complete %>%
 
 ```
 
+#Targeted sentiment analysis
+```{r}
+#find most frequent neg/pos words
 
+#cop26$Headlines %>% 
+#  corpus() %>% 
+#  tokens() %>%
+#  tokens_select("WORD", selection = "keep", window = 20, padding = FALSE, verbose = TRUE)
+#  tokens_lookup(data_dictionary_LSD2015[1:2])
+
+
+```
 
 
 
