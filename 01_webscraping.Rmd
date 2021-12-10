@@ -115,9 +115,11 @@ word_sent <- words_list %>%
 
 sentiment_complete <- left_join(words_list, word_sent, by = "word")
 
+#TO DO: new df w pos and neg counts as columns 
+
 sentiment_complete %>% 
   drop_na() %>% 
-  ggplot(aes(x = Dates, y = n, fill= sentiment))+
+  ggplot(aes(x = Dates, y = n, fill= -1*(sentiment== "negative")))+
   geom_bar(position="dodge", stat="identity", width= 0.5) +
   labs(title = "Sentiment frequency plot by date", y = "Frequency", x = "Date", fill = "sentiment") +
   theme_minimal()
