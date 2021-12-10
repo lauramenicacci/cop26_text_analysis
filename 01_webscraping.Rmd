@@ -19,6 +19,8 @@ library(xml2)
 library(quanteda)
 library(tidytext)
 library(lubridate)
+library(wordcloud)
+library(SnowballC)
 ```
 <br>
 
@@ -28,7 +30,6 @@ what i did until now:
  - create a list of all guardian pages within the chosen period (18 octr to 28 nov) (RMK:first/last page is with dates also before after 28 nov/18 oct but we can remove them in the cleaning part)
  - try to download pages from list of urls(pages_list) and store them in a dataframe
 ```{r}
-################################################################################
 
 baseurl <- "https://www.theguardian.com/environment/cop26-glasgow-climate-change-conference-2021?page="
 pageurl <- paste0(seq(1, 33, 1))
@@ -50,14 +51,8 @@ for (page in pages_list){
 
 headlineslist <- unique(headlineslist)
 
-
-# maybe we can take these out, we don't use "dates" in the for loop anymore
-oct <- grep("October", headlineslist)
-nov <- grep("November", headlineslist)
-dec <- grep("December", headlineslist)
-#dates <- append(oct, nov) %>% append(dec)
-
 # We iterate over the length of headlineslist, if we detect a match of "2021" in the headlineslist we recognise it as a date, and copy it into our dateslist. Note we keep the same position the date had in headlines. In the case were we don't find a date in the headlineslist, we fill the spot in dateslist with the previous entry (dateslist[i] <- dateslist[i-1]).
+
 for (i in 1:length(headlineslist)){
   if(grepl("2021", headlineslist[i]) == TRUE){
     dateslist[i] <- headlineslist[i]
@@ -72,72 +67,62 @@ for (i in 1:length(headlineslist)){
 cop26 <- cbind(as.data.frame(headlineslist), as.data.frame(dateslist)) %>% 
   filter(headlineslist != dateslist) %>% 
   rename("Headlines" = "headlineslist", "Dates" = "dateslist")
-View(cop26)
-
-
-################################################################################
 
 ```
 <br>
 
-### code for taking headlines + dates and transforming them in text
-```{r}
-guardian <- read_html("https://www.theguardian.com/environment/cop26-glasgow-climate-change-conference-2021?page=4")
-
-headlines <- guardian %>% 
-  html_nodes('body') %>% 
-  xml_find_all('//*[contains(concat( " ", @class, " " ), concat( " ", "fc-date-headline", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "js-headline-text", " " ))]') %>%
-  xml_text()
-
-#DATE CLASS //*[contains(concat( " ", @class, " " ), concat( " ", "fc-date-headline", " " ))]
-
-head(headlines, 20)
-```
-
-
-Note that the `echo = FALSE` parameter is added to the code chunk to prevent printing of the R code that generated the plot.
-
-# cleaning dates and headlines
+## Part 2 - Data cleaning 
 ```{r}
 
-cop26 <- cbind(as.data.frame(headlineslist), as.data.frame(dateslist)) %>% 
-  filter(headlineslist != dateslist) %>% 
-  rename("Headlines" = "headlineslist", "Dates" = "dateslist")
-#formatting dates, will try to edit manually or import actual dates for the nonfomratted lines later, I copied the chunk above to run it for testing the format changes
+#formatting dates, will try to edit manually or import actual dates for the nonfomratted lines later
 cop26$Dates<- as.Date(dmy(cop26$Dates) , format = "%d %B %Y")
 
-
-customized_stopwords<- add_row(stop_words, word="cop26", lexicon="customized_stopwrods")
-customized_stopwords<- add_row(customized_stopwords , word="glasgow", lexicon="customized_stopwords")
-customized_stopwords<- add_row(customized_stopwords , word="climate", lexicon="customized_stopwords")
-customized_stopwords<- add_row(customized_stopwords , word="change", lexicon="customized_stopwords")
+customized_stopwords<- add_row(stop_words , word= c("cop26", "glasgow","climate","change")) #crisis
 
 words_list<- cop26 %>% 
-  unnest_tokens(word,Headlines) %>% 
+  unnest_tokens(word, Headlines, token = "regex", pattern = "\\s+|[[:punct:]]+") %>%
   anti_join(customized_stopwords) %>% 
   arrange(Dates)
 
-
-
-#Another way to do the same as above, the difference in the below is that we deal with all headlines as if they are one text, could be useful or not, let's see  
-#
-#concatenation of headlines in one text
-#all_headlines<- as.character(cop26 %>% 
- # summarise( all_headlines = paste(Headlines, collapse = " ")))
-#headlines1<- data.frame(words = cop26$Headlines,stringsAsFactors = F)
-#unnesting
-#unnested1 <- headlines1 %>%
- # unnest_tokens(word,words,strip_punct = FALSE)
-
-
-#Filter
-#filtered<-unnested1[!(unnested1$word %in% customized_stopwords),] 
-
-
 ```
 
+## Explorative analysis
 
+Through the wordcloud, we observed that words as "cop26", "glasgow","climate","change" were very frequent and not really useful for a sentiment analysis, so we removed them. 
+```{r}
+#simple frequency table
+words_list %>% 
+  count(word, sort = TRUE) 
+ 
+#explorative wordcloud: we see the most frequent words: if there's something useless we remove it 
+wordcloud(words_list$word, min.freq = 20, random.order = FALSE, colors=brewer.pal(8, "Dark2"))
 
+#keyword in context
+cop26$Headlines %>% 
+  corpus() %>% 
+  tokens() %>% 
+  kwic(phrase("crisis"), window = 10) %>% 
+  DT::datatable(caption = "Keywords in context", rownames = FALSE, options = list(scrollX = TRUE, pageLength = 5, lengthMenu = c(5, 10, 15, 20)))
+
+```
+## Sentiment analysis
+
+Result: we have a dataframe with words, dates, sentiment and frequency of occurrence of those words
+```{r}
+word_sent <- words_list %>% 
+  inner_join(get_sentiments("bing")) %>% 
+  count(word, sentiment) 
+
+sentiment_complete <- left_join(words_list, word_sent, by = "word")
+
+sentiment_complete %>% 
+  drop_na() %>% 
+  ggplot(aes(x = Dates, y = n, fill= sentiment))+
+  geom_bar(position="dodge", stat="identity", width= 0.5) +
+  labs(title = "Sentiment frequency plot by date", y = "Frequency", x = "Date", fill = "sentiment") +
+  theme_minimal()
+
+```
 
 
 
