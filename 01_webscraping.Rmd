@@ -121,15 +121,20 @@ sentiment_complete <- left_join(words_list, word_sent, by = "word") #join with t
 
 #word_sent %>% 
 #  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) if we want to flip it
-  
-ifelse(sentiment_complete$sentiment == "negative", sentiment_complete$n == -n, n)
 
-sentiment_complete %>% #first plot of sentiment analysis
-  drop_na() %>% 
-  ggplot(aes(x = Dates, y = n, fill= sentiment))+
-  geom_bar(position="dodge", stat="identity", width= 0.5) +
-  labs(title = "Sentiment frequency plot by date", y = "Count", x = "Date", fill = "sentiment") +
-  theme_minimal()
+#ifelse(sentiment_complete$sentiment == "negative", sentiment_complete$n = -sentiment_complete$n, 0)
+
+sc <- sentiment_complete %>% #first plot of sentiment analysis
+  drop_na()
+
+  sc$n[sc$sentiment == 'negative'] = -sc$n 
+
+
+  sc %>% 
+    ggplot(aes(x = Dates, y = n, fill= sentiment))+
+    geom_bar(position="dodge", stat="identity", width= 0.5) +
+    labs(title = "Sentiment frequency plot by date", y = "Count", x = "Date", fill = "sentiment") +
+    theme_minimal()
 
 #add breaks
 #add interactive slider for dates
