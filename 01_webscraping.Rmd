@@ -104,42 +104,129 @@ cop26$Headlines %>%
   kwic(phrase("crisis"), window = 10) %>% 
   DT::datatable(caption = "Keywords in context", rownames = FALSE, options = list(scrollX = TRUE, pageLength = 5, lengthMenu = c(5, 10, 15, 20)))
 
+#frequency plot + take most frequent words and see where they appear
+
 ```
 ## Sentiment analysis
 
 Result: we have a dataframe with words, dates, sentiment and frequency of occurrence of those words
+first plot: we start from the general: visualize through time how sentiment changes! 
 ```{r}
-word_sent <- words_list %>% 
+word_sent <- words_list %>% #we have 293 classified words
+  filter(!word == "crisis") %>% #remove the word crisis before the sentiment analysis
   inner_join(get_sentiments("bing")) %>% 
   count(word, sentiment) 
+   
+sentiment_complete <- left_join(words_list, word_sent, by = "word") #join with the main df
 
-sentiment_complete <- left_join(words_list, word_sent, by = "word")
-
-#TO DO: new df w pos and neg counts as columns 
-
-sentiment_complete %>% 
+#word_sent %>% 
+#  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) if we want to flip it
+  
+sentiment_complete %>% #first plot of sentiment analysis
   drop_na() %>% 
-  ggplot(aes(x = Dates, y = n, fill= -1*(sentiment== "negative")))+
+  ggplot(aes(x = Dates, y = n, fill= sentiment))+
   geom_bar(position="dodge", stat="identity", width= 0.5) +
-  labs(title = "Sentiment frequency plot by date", y = "Frequency", x = "Date", fill = "sentiment") +
+  labs(title = "Sentiment frequency plot by date", y = "Count", x = "Date", fill = "sentiment") +
   theme_minimal()
 
-```
+#add breaks
+#add interactive slider for dates
+#change color
 
-#Targeted sentiment analysis
+```
+## exploration of results
+
+we try to understand which are the most used words overall. First we plot them without dates to see the overall result, then we add them in a second plot
 ```{r}
-#find most frequent neg/pos words
+sentiment_complete %>% 
+  drop_na() %>% 
+  count(word, sentiment, sort = TRUE) %>% 
+  group_by(sentiment) %>%
+  filter(n > 4) %>% 
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(n, word, fill = sentiment)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ sentiment, scales = "free_y") +
+  labs(x = "Contribution to sentiment",
+       y = NULL)
+```
 
-#cop26$Headlines %>% 
-#  corpus() %>% 
-#  tokens() %>%
-#  tokens_select("WORD", selection = "keep", window = 20, padding = FALSE, verbose = TRUE)
-#  tokens_lookup(data_dictionary_LSD2015[1:2])
 
+# Targeted sentiment analysis 
+```{r}
+#take most frequent neg words
+
+corpus_cop26 <- cop26$Headlines %>% 
+  corpus() 
+  
+docvars(corpus_cop26, field = "date") <- floor_date(docvars(cop26$Dates, field = "Year"))
+
+corpus(data_char_ukimmig2010, 
+                     docvars = data.frame(party = names(data_char_ukimmig2010)))
+
+corpus_cop26 %>% 
+  tokens()
+
+head(docvars(corpus_cop26))
+
+neg <- c("limit", "failure", "protest")
+
+toks_neg <- tokens_keep(toks_cop26, pattern = phrase(neg), window = 10)
+
+toks_neg_lsd <- tokens_lookup(toks_cop26, dictionary = data_dictionary_LSD2015[1:2]) #targeted sentiment analysis for the most negative words
+
+#create doc level variable for date
+dfm_neg_lsd <- dfm(toks_neg_lsd) %>% 
+  dfm_group(groups = date)
+
+
+#TO BE FINISHED
+
+
+#####
+#matplot(dfmat_gov_lsd$date, dfmat_gov_lsd, type = "l", lty = 1, col = 1:2,
+#        ylab = "Frequency", xlab = "")
+#grid()
+#legend("topleft", col = 1:2, legend = colnames(dfmat_gov_lsd), lty = 1, bg = "white")
+
+#####
+
+```
+
+```{r}
+
+sent_negative <- words_list %>% #we have 293 classified words
+  filter(!word == "crisis") %>% #remove the word crisis before the sentiment analysis
+  inner_join(get_sentiments("bing")) %>% 
+  filter(sentiment=="negative")
+
+sent_negative %>% 
+  count(Dates, sentiment) %>% 
+  ggplot(aes(x=Dates, y=n)) +
+  geom_line(color="red") +
+  theme_minimal() +
+  ylab("Frequency of Negative Words during COP26")+
+  xlab("Date")
+
+#do it both negative and positive SO COOOOL also NAs have a role
+sentiment_complete %>% 
+  #drop_na() %>% 
+  count(Dates, sentiment) %>% 
+  group_by(sentiment) %>%
+  ggplot(aes(x=Dates, y=n, color = sentiment)) +
+  geom_line() +
+  facet_wrap(~ sentiment, scales = "free_y") +
+  theme_minimal() +
+  ylab("Frequency of Negative Words during COP26")+
+  xlab("Date")
 
 ```
 
 
+```{r}
+#FOR OTHER IDEAS
 
+#https://www.tidytextmining.com/ngrams.html
+```
 
 
