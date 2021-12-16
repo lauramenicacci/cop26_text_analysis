@@ -165,19 +165,7 @@ sc %>%
 
 # Targeted sentiment analysis for 'Boris Johnson' 
 ```{r}
-<<<<<<< HEAD
-#take most frequent neg words
-boris_subset <- cop26 %>% filter(str_detect(Headlines, "Boris Johnson")|str_detect(Headlines, "Boris")|str_detect(Headlines, "Johnson"))
-
-
-corpus_cop26 <- boris_subset$Headlines %>% 
-  corpus() 
-
-corpus_cop261 <- cop26$Dates %>% 
-  corpus() 
-=======
 #take 'boris' and 'johnson' words
->>>>>>> f2f738c1eb7503dd0cfc334ac8dc5e44055f4637
 
 toks_cop26 <- cop26 %>% 
  filter(str_detect(Headlines, "Boris Johnson")|str_detect(Headlines, "Boris") | str_detect(Headlines, "Johnson"))
