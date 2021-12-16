@@ -25,11 +25,15 @@ library(SnowballC)
 <br>
 
 ## Part 1 - Scraping headlines by date 
+```{r}
+source("./scraping.R")
 
+```
 what i did until now: 
  - create a list of all guardian pages within the chosen period (18 octr to 28 nov) (RMK:first/last page is with dates also before after 28 nov/18 oct but we can remove them in the cleaning part)
  - try to download pages from list of urls(pages_list) and store them in a dataframe
 ```{r}
+
 
 baseurl <- "https://www.theguardian.com/environment/cop26-glasgow-climate-change-conference-2021?page="
 pageurl <- paste0(seq(1, 33, 1))
@@ -162,9 +166,10 @@ sc %>%
 # Targeted sentiment analysis 
 ```{r}
 #take most frequent neg words
+boris_subset <- cop26 %>% filter(str_detect(Headlines, "Boris Johnson")|str_detect(Headlines, "Boris")|str_detect(Headlines, "Johnson"))
 
 
-corpus_cop26 <- cop26$Headlines %>% 
+corpus_cop26 <- boris_subset$Headlines %>% 
   corpus() 
 
 corpus_cop261 <- cop26$Dates %>% 
