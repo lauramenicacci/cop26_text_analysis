@@ -129,10 +129,10 @@ sentiment_complete <- left_join(words_list, word_sent, by = "word") #join with t
 sc <- sentiment_complete %>% #first plot of sentiment analysis
   drop_na()
 
-  sc$n[sc$sentiment == 'negative'] = -sc$n 
+sc$n[sc$sentiment == 'negative'] = -sc$n 
 
 
-  sc %>% 
+sc %>% 
     ggplot(aes(x = Dates, y = n, fill= sentiment))+
     geom_bar(position="dodge", stat="identity", width= 0.5) +
     labs(title = "Sentiment frequency plot by date", y = "Count", x = "Date", fill = "sentiment") +
@@ -163,8 +163,9 @@ sc %>%
 ```
 
 
-# Targeted sentiment analysis 
+# Targeted sentiment analysis for 'Boris Johnson' 
 ```{r}
+<<<<<<< HEAD
 #take most frequent neg words
 boris_subset <- cop26 %>% filter(str_detect(Headlines, "Boris Johnson")|str_detect(Headlines, "Boris")|str_detect(Headlines, "Johnson"))
 
@@ -174,44 +175,31 @@ corpus_cop26 <- boris_subset$Headlines %>%
 
 corpus_cop261 <- cop26$Dates %>% 
   corpus() 
+=======
+#take 'boris' and 'johnson' words
+>>>>>>> f2f738c1eb7503dd0cfc334ac8dc5e44055f4637
 
-try_c <- cbind(corpus_cop26, corpus_cop261)
+toks_cop26 <- cop26 %>% 
+ filter(str_detect(Headlines, "Boris Johnson")|str_detect(Headlines, "Boris") | str_detect(Headlines, "Johnson"))
   
-#docvars(try_c, field = "Date") <- floor_date(docvars(try_c, field = "Date"))
-
-#corpus(data_char_ukimmig2010, 
-                     #docvars = data.frame(party = names(data_char_ukimmig2010)))
-
-toks_c <- try_c %>% 
+boris_c26 <- toks_cop26$Headlines %>% 
+  corpus() %>% 
   tokens()
 
-#head(docvars(corpus_cop26))
-
-neg <- c("limit", "failure", "protest")
-
-toks_neg <- tokens_keep(toks_c, pattern = phrase(neg), window = 10)
-
-toks_neg_lsd <- tokens_lookup(toks_c, dictionary = data_dictionary_LSD2015[1:2]) #targeted sentiment analysis for the most negative words
-
-#create doc level variable for date
-dfm_neg_lsd <- dfm(toks_neg_lsd)
-
-dfm_neg_lsd %>% 
-  convert(to = "data.frame") #%>% 
-  ggplot(aes())
+sent_boris <- tokens_lookup(boris_c26, dictionary = data_dictionary_LSD2015[1:2]) %>% 
+  dfm() %>% 
+  convert(to = "data.frame") #targeted sentiment analysis for the boris words
 
 
+sent_boris$score <- log((sent_boris$positive + 0.5) / (sent_boris$negative + 0.5))
 
-#TO BE FINISHED
+sent_boris$average
 
-
-#####
-#matplot(dfmat_gov_lsd$date, dfmat_gov_lsd, type = "l", lty = 1, col = 1:2,
-#        ylab = "Frequency", xlab = "")
-#grid()
-#legend("topleft", col = 1:2, legend = colnames(dfmat_gov_lsd), lty = 1, bg = "white")
-
-#####
+sent_boris %>% 
+  ggplot(aes(y = score)) + 
+  geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.6) +
+  coord_flip() +
+  theme_minimal()
 
 ```
 
@@ -232,12 +220,12 @@ sent_negative %>%
 
 #do it both negative and positive SO COOOOL also NAs have a role
 sentiment_complete %>% 
-  #drop_na() %>% 
+  drop_na() %>% 
   count(Dates, sentiment) %>% 
   group_by(sentiment) %>%
-  ggplot(aes(x=Dates, y=n, color = sentiment)) +
+  ggplot(aes(Dates,y=n,color=sentiment)) +
   geom_line() +
-  facet_wrap(~ sentiment, scales = "free_y") +
+  #facet_wrap(~ sentiment, scales = "free_x") +
   theme_minimal() +
   ylab("Frequency of Negative Words during COP26")+
   xlab("Date")
