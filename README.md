@@ -20,11 +20,11 @@ The steps we followed for the sentiment analysis are:
  - Nassim Zoueini
 
 # Resources
-Young, L. & Soroka, S. (2012). Affective News: The Automated Coding of Sentiment in Political Texts]. doi: 10.1080/10584609.2012.671234 . Political Communication, 29(2), 205--231
+Young, L. & Soroka, S. (2012). Affective News: The Automated Coding of Sentiment in Political Texts]. doi: 10.1080/10584609.2012.671234. Political Communication, 29(2), 205--231
 
-[Text Mining with R: A Tidy Approach] (https://www.tidytextmining.com/index.html) 
+[Text Mining with R: A Tidy Approach](https://www.tidytextmining.com/index.html) 
 
-[Quanteda Tutorials] (https://tutorials.quanteda.io/)
+[Quanteda Tutorials](https://tutorials.quanteda.io/)
 
 # License
 The material in this repository is made available under the MIT license.
