@@ -16,7 +16,9 @@ The steps we followed for the sentiment analysis are:
 
 # Collaborators
 Katalin Bayer
+
 Laura Menicacci
+
 Nassim Zoueini
 
 # Resources
