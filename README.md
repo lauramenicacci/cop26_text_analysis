@@ -7,8 +7,8 @@ The project is structures as follows (1) webscraping: we retrieve the headlines 
 
 # Main steps of the sentiment analysis
 The steps we followed for the sentiment analysis are: 
-- an explorative section of the retrieved headlines, in which we observed some of the most frequent words, and tried to understand whether they could fit for our analysis or just be removed as stopowords 
-- the first sentiment analysis, in which we joined the dataset with the Bing et al. dictionary, plotting it with dates and frequencies in an interactive plot 
+- explorative section of the retrieved headlines, in which we observed some of the most frequent words, and tried to understand whether they could fit for our analysis or just be removed as stopowords 
+- first sentiment analysis, in which we joined the dataset with the Bing et al. dictionary, plotting it with dates and frequencies in an interactive plot 
 - visualization of most frequent words between negative and positive
 - visualization of the headlines' sentiment distribution using the LSD2015 dictionary 
 - targeted sentiment analysis for the bigram 'Boris Johnson' with the LSD2015 dictionary, with similar visualization of the results
