@@ -181,7 +181,7 @@ sent_boris$average
 
 sent_boris %>% 
   ggplot(aes(y = score)) + 
-  geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.8) +
+  geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.6) +
   coord_flip() +
   theme_minimal()
 
@@ -204,12 +204,12 @@ sent_negative %>%
 
 #do it both negative and positive SO COOOOL also NAs have a role
 sentiment_complete %>% 
-  #drop_na() %>% 
+  drop_na() %>% 
   count(Dates, sentiment) %>% 
   group_by(sentiment) %>%
-  ggplot(aes(x=Dates, y=n, color = sentiment)) +
+  ggplot(aes(Dates,y=n,color=sentiment)) +
   geom_line() +
-  facet_wrap(~ sentiment, scales = "free_y") +
+  #facet_wrap(~ sentiment, scales = "free_x") +
   theme_minimal() +
   ylab("Frequency of Negative Words during COP26")+
   xlab("Date")
