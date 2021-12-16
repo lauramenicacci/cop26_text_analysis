@@ -189,6 +189,27 @@ sent_boris %>%
   coord_flip() +
   theme_minimal()
 
+################################################################################
+
+c26_density <- cop26$Headlines %>% 
+  corpus() %>% 
+  tokens()
+
+sent_c26 <- tokens_lookup(c26_density, dictionary = data_dictionary_LSD2015[1:2]) %>% 
+  dfm() %>% 
+  convert(to = "data.frame") #targeted sentiment analysis for the boris words
+
+
+sent_c26$score <- log((sent_c26$positive + 0.5) / (sent_c26$negative + 0.5))
+
+sent_c26$average
+
+sent_c26 %>% 
+  ggplot(aes(y = score)) + 
+  geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.6) +
+  coord_flip() +
+  theme_minimal()
+
 ```
 
 ```{r}
