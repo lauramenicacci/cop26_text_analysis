@@ -120,9 +120,7 @@ word_sent <- words_list %>% #we have 293 classified words
 sentiment_complete <- left_join(words_list, word_sent, by = "word") #join with the main df
 
 #word_sent %>% 
-#  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) if we want to flip it
-
-#ifelse(sentiment_complete$sentiment == "negative", sentiment_complete$n = -sentiment_complete$n, 0)
+#  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) if we want to flip it 
 
 sc <- sentiment_complete %>% #first plot of sentiment analysis
   drop_na()
@@ -147,7 +145,7 @@ sc <- sentiment_complete %>% #first plot of sentiment analysis
 
 we try to understand which are the most used words overall. First we plot them without dates to see the overall result, then we add them in a second plot
 ```{r}
-sentiment_complete %>% 
+sc %>% 
   drop_na() %>% 
   count(word, sentiment, sort = TRUE) %>% 
   group_by(sentiment) %>%
@@ -165,28 +163,38 @@ sentiment_complete %>%
 ```{r}
 #take most frequent neg words
 
+
 corpus_cop26 <- cop26$Headlines %>% 
   corpus() 
+
+corpus_cop261 <- cop26$Dates %>% 
+  corpus() 
+
+try_c <- cbind(corpus_cop26, corpus_cop261)
   
-docvars(corpus_cop26, field = "date") <- floor_date(docvars(cop26$Dates, field = "Year"))
+#docvars(try_c, field = "Date") <- floor_date(docvars(try_c, field = "Date"))
 
-corpus(data_char_ukimmig2010, 
-                     docvars = data.frame(party = names(data_char_ukimmig2010)))
+#corpus(data_char_ukimmig2010, 
+                     #docvars = data.frame(party = names(data_char_ukimmig2010)))
 
-corpus_cop26 %>% 
+toks_c <- try_c %>% 
   tokens()
 
-head(docvars(corpus_cop26))
+#head(docvars(corpus_cop26))
 
 neg <- c("limit", "failure", "protest")
 
-toks_neg <- tokens_keep(toks_cop26, pattern = phrase(neg), window = 10)
+toks_neg <- tokens_keep(toks_c, pattern = phrase(neg), window = 10)
 
-toks_neg_lsd <- tokens_lookup(toks_cop26, dictionary = data_dictionary_LSD2015[1:2]) #targeted sentiment analysis for the most negative words
+toks_neg_lsd <- tokens_lookup(toks_c, dictionary = data_dictionary_LSD2015[1:2]) #targeted sentiment analysis for the most negative words
 
 #create doc level variable for date
-dfm_neg_lsd <- dfm(toks_neg_lsd) %>% 
-  dfm_group(groups = date)
+dfm_neg_lsd <- dfm(toks_neg_lsd)
+
+dfm_neg_lsd %>% 
+  convert(to = "data.frame") #%>% 
+  ggplot(aes())
+
 
 
 #TO BE FINISHED
