@@ -13,7 +13,19 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(tidyverse, rvest, stringr, xml2, quanteda, janitor, tidytext, lubridate, wordcloud, SnowballC, dygraphs, xts, tsbox)
+pacman::p_load(tidyverse, 
+               rvest, 
+               stringr, 
+               xml2, 
+               quanteda, 
+               janitor, 
+               tidytext, 
+               lubridate, 
+               wordcloud, 
+               SnowballC, 
+               dygraphs, 
+               xts, 
+               tsbox)
 ```
 <br>
 
@@ -180,15 +192,16 @@ sent_c26 %>%
 sentiment_complete %>%
   count(Dates,sentiment) %>% 
   mutate(across(sentiment, .fns = ~replace_na(.,"neutral")))-> counter #creating a dataframe counting each type of sentiment, replacing NA sentiment by neutral
+
 counter %>% 
   build_wider_spec(names_from = sentiment, values_from = c(n))->spec1
 counter<-counter %>% 
   pivot_wider_spec(spec1) %>% 
   na.omit() # to pivot the data frame, single date per line, all sentiments per column 
 
-negatives<-as.ts(counter$negative) #creating a time series for each sentiment
-positives<-as.ts(counter$positive)
-neutrals<-as.ts(counter$neutral)
+negatives<-xts(counter$negative, counter$Dates) #creating a time series for each sentiment
+positives<-xts(counter$positive, counter$Dates)
+neutrals<-xts(counter$neutral, counter$Dates)
 
 timeseries <- cbind(negatives, positives,neutrals) # binding the three time series
 dygraph(timeseries) %>%  #the plot, unfortunately, the dates are lost so far
@@ -199,7 +212,10 @@ dygraph(timeseries) %>%  #the plot, unfortunately, the dates are lost so far
   dyRangeSelector() %>%
   dyCrosshair(direction = "vertical") %>%
   dyHighlight(highlightCircleSize = 3, highlightSeriesBackgroundAlpha = 0.3, hideOnMouseOut = FALSE)  %>%
-  dyRoller(rollPeriod = 1)
+  dyRoller(rollPeriod = 1) 
+
+
+?dyAxis()
 
 #plotting positive and negative only
 
