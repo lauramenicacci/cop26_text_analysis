@@ -12,7 +12,6 @@ The steps we followed for the sentiment analysis are:
 - visualization of most frequent words between negative and positive
 - visualization of the headlines' sentiment distribution using the LSD2015 dictionary 
 - targeted sentiment analysis for the bigram 'Boris Johnson' with the LSD2015 dictionary, with similar visualization of the results
-- topic modeling (?)
 
 # Collaborators
  - Katalin Bayer 
