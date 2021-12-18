@@ -1,15 +1,32 @@
 ---
-title: "01_downloading articles"
-author: "Laura Menicacci"
-date: "28/11/2021"
+title: "A Sentiment Analysis of the Headlines of COP26 on 'The Guardian' "
+author: "Katalin Bayer, Laura Menicacci, Nassim Zoueini"
+date: "19/12/2021"
 output: html_document
 ---
+
+<style>
+div.comment {font-size:14pt; background-color:#f3f0ff; border-radius: 5px; padding: 20px;}
+</style>
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+<br>
 
-## Packages
+<div class="comment">
+<strong> Introduction </strong>
+<br>
+In this project, we target the headlines of "The Guardian" newspaper between 18. October 2021 and 28. November 2021 to apply a sentiment analysis around the negotiations of COP26 that took place in Glasgow from October 31st and November 12. 
+<br>
+Being a newspaper of the host country of the climate negotiation, the guardian would not present an ideal sample of headlines that would allow us to deduce  if COP26 has met the expectations or not through the sentiment analysis. However, the values of this project is to apply procedures of sentiment analysis after scraping information from the web and present them to the user in an accessible format.
+</div>
+
+<br>
+<h2>
+1. Packages
+</h2>
 
 ```{r}
 if (!require("pacman")) install.packages("pacman")
@@ -29,53 +46,94 @@ pacman::p_load(tidyverse,
 ```
 <br>
 
-## Part 1 - Scraping headlines by date 
+<h2>
+2. Scraping Headlines by Date and Data Cleaning
+</h2>
+<div>
+<i> To examine this step in details, check the attached scraping.R file on <a href="url"> https://github.com/lauramenicacci/cop26_text_analysis/blob/e3697a69534a5e9d540bfc1913f52bd096de99ee/scraping.R</a> </i>
+</div>
 ```{r}
 source("./scraping_and_data_cleaning.R")
 
 ```
-what i did until now: 
- - create a list of all guardian pages within the chosen period (18 octr to 28 nov) (RMK:first/last page is with dates also before after 28 nov/18 oct but we can remove them in the cleaning part)
- - try to download pages from list of urls(pages_list) and store them in a dataframe
-```{r}
 
-# SOURCED ABOVE 
+<br>
+<br>
+<h2>
+3. Explorative analysis
+</h2>
+<div class="comment">
+Through the wordcloud, we observed that words as "cop26", "glasgow","climate","change" were very frequent and not really useful for a sentiment analysis, so we removed them.
+PLEASE LAURA ADD OTHER RELEVANT DESCRIPTION HERE
+3.1. Frequency Table 
+<br>
+3.2. Explorative Wordcloud
+<br>
+3.3.Keyword in Context
+<br>
+</div>
+<br>
+<br>
+<h3>
+3.1. Frequency Table
+</h3>
+```{r}
+words_list %>% 
+  count(word, sort = TRUE) %>% 
+  head(10)
+ 
+
+#frequency plot + take most frequent words and see where they appear WE DROPPED THIS?
 
 ```
 <br>
-
-## Part 2 - Data cleaning 
+<h3>
+3.2. Explorative Wordcloud
+</h3>
 ```{r}
-
-# ALSO INCLUDED IN THE "scraping_and_data_cleaning.R" file
-
-```
-
-## Explorative analysis
-
-Through the wordcloud, we observed that words as "cop26", "glasgow","climate","change" were very frequent and not really useful for a sentiment analysis, so we removed them. 
-```{r}
-#simple frequency table
-words_list %>% 
-  count(word, sort = TRUE) 
- 
 #explorative wordcloud: we see the most frequent words: if there's something useless we remove it 
 wordcloud(words_list$word, min.freq = 20, random.order = FALSE, colors=brewer.pal(8, "Dark2"))
+```
+<div class="comment">
+<i> Exploring the most frequent words helps to remove the irrelevant ones among them by adding them to the stopwords dictionary i.e. Glasgow. EDIT PLEASE </i>
+<br>
+</div>
+<div>
+<i>Check scraping file https://github.com/lauramenicacci/cop26_text_analysis/blob/e3697a69534a5e9d540bfc1913f52bd096de99ee/scraping.R</a>
+</i>
+<br>
+</div>
+<br>
+<h3>
+3.3. Keyword in Context
+</h3>
+```{r}
 
-#keyword in context
 cop26$Headlines %>% 
   corpus() %>% 
   tokens() %>% 
   kwic(phrase("crisis"), window = 10) %>% 
   DT::datatable(caption = "Keywords in context", rownames = FALSE, options = list(scrollX = TRUE, pageLength = 5, lengthMenu = c(5, 10, 15, 20)))
-
-#frequency plot + take most frequent words and see where they appear
-
 ```
-## Sentiment analysis
-
+<br>
+<br>
+<h2>
+4. Sentiment analysis Using "bing" Dictionary
+</h2>
+<br>
+<div class="comment">
 Result: we have a dataframe with words, dates, sentiment and frequency of occurrence of those words
-first plot: we start from the general: visualize through time how sentiment changes! 
+first plot: we start from the general: visualize through time how sentiment changes! TO BE EDITED
+
+<br>
+4.1. Sentiment Analysis Dataframe
+<br>
+4.2. Basic Visualization
+</div>
+<br>
+<h3>
+4.1. Sentiment Analysis Dataframe
+</h3>
 ```{r}
 word_sent <- words_list %>% #we have 293 classified words
   filter(!word == "crisis") %>% #remove the word crisis before the sentiment analysis
@@ -87,6 +145,21 @@ sentiment_complete <- left_join(words_list, word_sent, by = "word") #join with t
 #word_sent %>% 
 #  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) if we want to flip it 
 
+
+
+#add breaks is this DONE (?)
+#add interactive slider for dates DONE
+#change color
+
+
+
+```
+<br>
+<h3>
+4.2. Basic Visualization
+</h3>
+
+```{r}
 sc <- sentiment_complete %>% #first plot of sentiment analysis
   drop_na()
 
@@ -98,17 +171,34 @@ sc %>%
     geom_bar(position="dodge", stat="identity", width= 0.5) +
     labs(title = "Sentiment frequency plot by date", y = "Count", x = "Date", fill = "sentiment") +
     theme_minimal()
-
-#add breaks
-#add interactive slider for dates
-#change color
-
-
-
 ```
-## exploration of results
+
+<br>
+<br>
+
+<h2>
+5. Exploration of Results
+</h2>
+<br>
+<div class="comment">
+PLEASE LAURA ADD DESCRIPTION HERE
 
 we try to understand which are the most used words overall. First we plot them without dates to see the overall result, then we add them in a second plot
+<br>
+5.1. Plot of Results
+<br>
+5.2. Summary Interactive Plot by Date
+<br>
+5.2.1. Manipulation of the Dataset into a #timeseries' Object
+<br>
+5.2.2. All Sentiment Interactive Plot by Date
+<br>
+5.2.3. Positive vs Negative Sentiment Interactive Plots by Date
+</div>
+<br>
+<h3>
+5.1. Plot of Results
+</h3>
 ```{r}
 sc %>% 
   drop_na() %>% 
@@ -122,11 +212,106 @@ sc %>%
   labs(x = "Contribution to sentiment",
        y = NULL)
 ```
-
-
-# Targeted sentiment analysis for 'Boris Johnson' 
+<br>
+<h3>
+5.2. Summary Interactive Plots
+</h3>
+<h4>
+5.2.1. Manipulation of the Dataset into a 'timeseries' Object
+</h4>
 ```{r}
-#take 'boris' and 'johnson' words
+
+sentiment_complete %>%
+  count(Dates,sentiment) %>% 
+  mutate(across(sentiment, .fns = ~replace_na(.,"neutral")))-> counter #creating a dataframe counting each type of sentiment, replacing NA sentiment by neutral
+
+counter %>% 
+  build_wider_spec(names_from = sentiment, values_from = c(n))->spec1
+counter<-counter %>% 
+  pivot_wider_spec(spec1) %>% 
+  na.omit() # to pivot the data frame, single date per line, all sentiments per column 
+
+negatives<-xts(counter$negative, counter$Dates) #creating a time series for each sentiment
+positives<-xts(counter$positive, counter$Dates)
+neutrals<-xts(counter$neutral, counter$Dates)
+
+timeseries <- cbind(negatives, positives,neutrals) # binding the three time series
+
+```
+<br>
+<h4>
+5.2.2. All Sentiment Interactive Plot by Date
+</h4>
+```{r}
+dygraph(timeseries) %>%  #the plot, unfortunately, the dates are lost so far
+  dySeries("negatives", label="Negative") %>% 
+  dySeries("positives", label="Positive") %>% 
+  dySeries("neutrals", label="Neutral") %>%
+  dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.5, drawGrid = FALSE) %>%
+  dyRangeSelector() %>%
+  dyCrosshair(direction = "vertical") %>%
+  dyHighlight(highlightCircleSize = 3, highlightSeriesBackgroundAlpha = 0.3, hideOnMouseOut = FALSE)  %>%
+  dyRoller(rollPeriod = 1) 
+```
+<br>
+<h4>
+5.2.3. Positive vs Negative Sentiment Interactive Plots by Date
+</h4>
+```{r}
+
+timeseries2<-cbind(negatives, positives)
+dygraph(timeseries2) %>%  #the plot, unfortunately, the dates are lost so far
+  dySeries("negatives", label="Negative") %>% 
+  dySeries("positives", label="Positive") %>% 
+  dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.5, drawGrid = FALSE) %>%
+  dyRangeSelector() %>%
+  dyCrosshair(direction = "vertical") %>%
+  dyHighlight(highlightCircleSize = 3, highlightSeriesBackgroundAlpha = 0.3, hideOnMouseOut = FALSE)  %>%
+  dyRoller(rollPeriod = 1)
+```
+
+<br>
+<br>
+<h2>
+6. Targeted sentiment analysis
+</h2>
+<div class="comment">
+KATALIN PLEASE EDIT HERE
+<br>
+6.1 Sentiment Density for COP26
+<br>
+6.2 Sentiment Density, Target: Boris Johnson
+</div>
+<br>
+<h3>
+6.1 Sentiment Density for COP26
+</h3>
+```{r}
+c26_density <- cop26$Headlines %>% 
+  corpus() %>% 
+  tokens()
+
+sent_c26 <- tokens_lookup(c26_density, dictionary = data_dictionary_LSD2015[1:2]) %>% 
+  dfm() %>% 
+  convert(to = "data.frame") #targeted sentiment analysis for the boris words
+
+
+sent_c26$score <- log((sent_c26$positive + 0.5) / (sent_c26$negative + 0.5))
+
+sent_c26$average
+
+sent_c26 %>% 
+  ggplot(aes(y = score)) + 
+  geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.6) +
+  coord_flip() +
+  theme_minimal()
+
+```
+<br>
+<h3>
+6.2 Sentiment Density, Target: Boris Johnson
+</h3>
+```{r}
 
 toks_cop26 <- cop26 %>% 
  filter(str_detect(Headlines, "Boris Johnson")|str_detect(Headlines, "Boris") | str_detect(Headlines, "Johnson"))
@@ -149,28 +334,6 @@ sent_boris %>%
   geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.6) +
   coord_flip() +
   theme_minimal()
-
-################################################################################
-
-c26_density <- cop26$Headlines %>% 
-  corpus() %>% 
-  tokens()
-
-sent_c26 <- tokens_lookup(c26_density, dictionary = data_dictionary_LSD2015[1:2]) %>% 
-  dfm() %>% 
-  convert(to = "data.frame") #targeted sentiment analysis for the boris words
-
-
-sent_c26$score <- log((sent_c26$positive + 0.5) / (sent_c26$negative + 0.5))
-
-sent_c26$average
-
-sent_c26 %>% 
-  ggplot(aes(y = score)) + 
-  geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.6) +
-  coord_flip() +
-  theme_minimal()
-
 ```
 
 ```{r}
@@ -188,46 +351,7 @@ sent_c26 %>%
   #ylab("Frequency of Negative Words during COP26")+
   #xlab("Date")
 
-#Interactive graph
-sentiment_complete %>%
-  count(Dates,sentiment) %>% 
-  mutate(across(sentiment, .fns = ~replace_na(.,"neutral")))-> counter #creating a dataframe counting each type of sentiment, replacing NA sentiment by neutral
 
-counter %>% 
-  build_wider_spec(names_from = sentiment, values_from = c(n))->spec1
-counter<-counter %>% 
-  pivot_wider_spec(spec1) %>% 
-  na.omit() # to pivot the data frame, single date per line, all sentiments per column 
-
-negatives<-xts(counter$negative, counter$Dates) #creating a time series for each sentiment
-positives<-xts(counter$positive, counter$Dates)
-neutrals<-xts(counter$neutral, counter$Dates)
-
-timeseries <- cbind(negatives, positives,neutrals) # binding the three time series
-dygraph(timeseries) %>%  #the plot, unfortunately, the dates are lost so far
-  dySeries("negatives", label="Negative") %>% 
-  dySeries("positives", label="Positive") %>% 
-  dySeries("neutrals", label="Neutral") %>%
-  dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.5, drawGrid = FALSE) %>%
-  dyRangeSelector() %>%
-  dyCrosshair(direction = "vertical") %>%
-  dyHighlight(highlightCircleSize = 3, highlightSeriesBackgroundAlpha = 0.3, hideOnMouseOut = FALSE)  %>%
-  dyRoller(rollPeriod = 1) 
-
-
-?dyAxis()
-
-#plotting positive and negative only
-
-timeseries2<-cbind(negatives, positives)
-dygraph(timeseries2) %>%  #the plot, unfortunately, the dates are lost so far
-  dySeries("negatives", label="Negative") %>% 
-  dySeries("positives", label="Positive") %>% 
-  dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.5, drawGrid = FALSE) %>%
-  dyRangeSelector() %>%
-  dyCrosshair(direction = "vertical") %>%
-  dyHighlight(highlightCircleSize = 3, highlightSeriesBackgroundAlpha = 0.3, hideOnMouseOut = FALSE)  %>%
-  dyRoller(rollPeriod = 1)
 
 
 #I kept the ggplot on case we will drop the interactive ones
