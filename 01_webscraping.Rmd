@@ -42,7 +42,10 @@ pacman::p_load(tidyverse,
                SnowballC, 
                dygraphs, 
                xts, 
-               tsbox)
+               tsbox,
+               tm)
+
+# DO WE NEED TO LOAD TM SEPERATELY OR NOT?
 ```
 <br>
 
@@ -83,7 +86,8 @@ words_list %>%
   head(10)
  
 
-#frequency plot + take most frequent words and see where they appear WE DROPPED THIS?
+#frequency plot + take most frequent words and see where they appear 
+#WE DROPPED THIS?
 
 ```
 <br>
@@ -108,7 +112,6 @@ wordcloud(words_list$word, min.freq = 20, random.order = FALSE, colors=brewer.pa
 3.3. Keyword in Context
 </h3>
 ```{r}
-
 cop26$Headlines %>% 
   corpus() %>% 
   tokens() %>% 
@@ -163,14 +166,16 @@ sentiment_complete <- left_join(words_list, word_sent, by = "word") #join with t
 sc <- sentiment_complete %>% #first plot of sentiment analysis
   drop_na()
 
-sc$n[sc$sentiment == 'negative'] = -sc$n 
-
+sc$n[sc$sentiment == 'negative'] <-  -sc$n 
 
 sc %>% 
-    ggplot(aes(x = Dates, y = n, fill= sentiment))+
-    geom_bar(position="dodge", stat="identity", width= 0.5) +
-    labs(title = "Sentiment frequency plot by date", y = "Count", x = "Date", fill = "sentiment") +
-    theme_minimal()
+  ggplot(aes(x = Dates, y = n, fill = sentiment))+
+  geom_bar(stat = "identity", width = 0.5) +
+  labs(title = "Sentiment frequency plot by date", y = "Count", x = "Date", fill = "sentiment") + geom_vline(xintercept= as.Date("2021-10-31"), linetype = "dashed", colour = "darkgrey") +
+  geom_vline(xintercept= as.Date("2021-11-12"), linetype = "dashed", colour = "darkgrey") +
+  theme_minimal()+ theme(panel.border = element_rect(color = "black",
+                                    fill = NA,
+                                    size = 0.3))
 ```
 
 <br>
@@ -209,8 +214,11 @@ sc %>%
   ggplot(aes(n, word, fill = sentiment)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~ sentiment, scales = "free_y") +
-  labs(x = "Contribution to sentiment",
-       y = NULL)
+  labs(title = "Most common words affecting Sentiments", x = "Frequency", y = NULL)+
+  theme_minimal() + 
+  theme(panel.border = element_rect(color = "black",
+                                    fill = NA,
+                                    size = 0.3))
 ```
 <br>
 <h3>
@@ -287,53 +295,39 @@ KATALIN PLEASE EDIT HERE
 6.1 Sentiment Density for COP26
 </h3>
 ```{r}
-c26_density <- cop26$Headlines %>% 
-  corpus() %>% 
-  tokens()
-
-sent_c26 <- tokens_lookup(c26_density, dictionary = data_dictionary_LSD2015[1:2]) %>% 
-  dfm() %>% 
-  convert(to = "data.frame") #targeted sentiment analysis for the boris words
-
-
-sent_c26$score <- log((sent_c26$positive + 0.5) / (sent_c26$negative + 0.5))
-
-sent_c26$average
-
-sent_c26 %>% 
-  ggplot(aes(y = score)) + 
-  geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.6) +
-  coord_flip() +
-  theme_minimal()
-
-```
-<br>
-<h3>
-6.2 Sentiment Density, Target: Boris Johnson
-</h3>
-```{r}
-
-toks_cop26 <- cop26 %>% 
+boris <- cop26 %>% 
  filter(str_detect(Headlines, "Boris Johnson")|str_detect(Headlines, "Boris") | str_detect(Headlines, "Johnson"))
-  
-boris_c26 <- toks_cop26$Headlines %>% 
+
+c26_toks <- cop26$Headlines %>% 
+  corpus() %>% 
+  tokens()
+boris_toks <- boris$Headlines %>% 
   corpus() %>% 
   tokens()
 
-sent_boris <- tokens_lookup(boris_c26, dictionary = data_dictionary_LSD2015[1:2]) %>% 
+sent_c26 <- tokens_lookup(c26_toks, dictionary = data_dictionary_LSD2015[1:2]) %>% 
   dfm() %>% 
-  convert(to = "data.frame") #targeted sentiment analysis for the boris words
+  convert(to = "data.frame") %>% #targeted sentiment analysis for the boris words
+  mutate(Type = "Cop26")
+  
+sent_boris <- tokens_lookup(boris_toks, dictionary = data_dictionary_LSD2015[1:2]) %>% 
+  dfm() %>% 
+  convert(to = "data.frame") %>% #targeted sentiment analysis for the boris words
+  mutate(Type = "Boris")
 
+sentiment <- rbind(sent_c26,sent_boris)
+sentiment$score <- log((sentiment$positive + 0.5) / (sentiment$negative + 0.5))
 
-sent_boris$score <- log((sent_boris$positive + 0.5) / (sent_boris$negative + 0.5))
+sentiment %>% 
+  ggplot(aes(x = score, fill = Type)) + 
+  geom_density(alpha=0.3) +
+  labs(title = "Distribution of Sentiments", subtitle = str_wrap('This graph plots the density of sentiments across all headlines, as well as the density of a targeted sentiment analysis around the name "Boris Johnson".', width = 85), x = "Sentiment Score", y = "Density")+
+  theme_minimal() + 
+  theme_minimal() +
+  theme(panel.border = element_rect(color = "black",
+                                    fill = NA,
+                                    size = 0.3))
 
-sent_boris$average
-
-sent_boris %>% 
-  ggplot(aes(y = score)) + 
-  geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.6) +
-  coord_flip() +
-  theme_minimal()
 ```
 
 ```{r}
