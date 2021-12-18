@@ -43,7 +43,6 @@ cop26 <- cbind(as.data.frame(headlineslist), as.data.frame(dateslist)) %>%
   filter(headlineslist != dateslist) %>% 
   rename("Headlines" = "headlineslist", "Dates" = "dateslist")
 
-#formatting dates, will try to edit manually or import actual dates for the nonfomratted lines later
 cop26$Dates<- as.Date(dmy(cop26$Dates) , format = "%d %B %Y")
 
 customized_stopwords<- add_row(stop_words , word= c("cop26", "glasgow","climate","change")) #crisis
