@@ -30,6 +30,7 @@ Being a newspaper of the host country of the climate negotiation, the guardian w
 
 ```{r}
 if (!require("pacman")) install.packages("pacman")
+if (!require("phantomjs")) webshot::install_phantomjs()
 pacman::p_load(tidyverse, 
                rvest, 
                stringr, 
@@ -43,7 +44,9 @@ pacman::p_load(tidyverse,
                dygraphs, 
                xts, 
                tsbox,
-               tm)
+               tm, 
+               kableExtra,
+               magick)
 
 ```
 
@@ -63,8 +66,9 @@ source("./scraping_and_data_cleaning.R")
 ```{r}
 words_list %>% 
   count(word, sort = TRUE) %>% 
-  head(10)
+  head(10) %>% kbl() %>% kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, fixed_thead = T) %>% save_kable("FrequencyTable.html")
 
+png("FrequencyTable.png")
 ggsave("FrequencyTable.png", width = 5, height = 3)
 
 ```
@@ -74,6 +78,8 @@ ggsave("FrequencyTable.png", width = 5, height = 3)
 ```{r}
 #explorative wordcloud: we see the most frequent words: if there's something useless we remove it 
 wordcloud(words_list$word, min.freq = 20, random.order = FALSE, colors=brewer.pal(8, "Dark2"))
+
+
 ```
  Exploring the most frequent words helps to remove the irrelevant ones among them by adding them to the stopwords dictionary i.e. Glasgow. 
 
