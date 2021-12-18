@@ -1,4 +1,4 @@
-# Sentiment analysis of COP26 headlines from a British outlet
+# Sentiment analysis of COP26 related headlines from a British outlet
 This repository comprises all the material created and used for the Introduction to Data Science final project at the [Hertie School](https://www.hertie-school.org/en/), Berlin, taught by Simon Munzert in Fall 2021.
 The project consists of an analysis of the sentiment from articles published by [The Guardian's COP26 section](https://www.theguardian.com/environment/cop26-glasgow-climate-change-conference-2021) over a specific period of time. Our aim is to analyse whether such a newspaper, representing in this case a small sample of the media outlet reality in UK, could present changes in the sentiment of content circulating in the period before, during and after COP26. 
 
