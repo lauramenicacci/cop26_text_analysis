@@ -225,7 +225,7 @@ sc %>%
   theme(panel.border = element_rect(color = "black",
                                     fill = NA,
                                     size = 0.3))
-ggsave("MostFrequentlyOccuringWord.png")
+ggsave("MostFrequentlyOccuringWord.png", width = 5, height = 3)
 ```
 <br>
 <h3>
@@ -257,8 +257,8 @@ timeseries <- cbind(negatives, positives,neutrals) # binding the three time seri
 <h4>
 5.2.2. All Sentiment Interactive Plot by Date
 </h4>
-```{r}
-dygraph(timeseries, main = "All sentiments across time") %>%  #the plot, unfortunately, the dates are lost so far
+```{r, include=FALSE}
+dygraph(timeseries, main = "All sentiments across time", xlab = "Date", ylab = "Frequency") %>%  #the plot, unfortunately, the dates are lost so far
   dySeries("negatives", label="Negative") %>% 
   dySeries("positives", label="Positive") %>% 
   dySeries("neutrals", label="Neutral") %>%
@@ -275,7 +275,7 @@ dygraph(timeseries, main = "All sentiments across time") %>%  #the plot, unfortu
 ```{r}
 
 timeseries2<-cbind(negatives, positives)
-dygraph(timeseries2) %>%  #the plot, unfortunately, the dates are lost so far
+dygraph(timeseries2, main = "Positive and negative sentiments across time", xlab = "Date", ylab = "Frequency") %>%  #the plot, unfortunately, the dates are lost so far
   dySeries("negatives", label="Negative") %>% 
   dySeries("positives", label="Positive") %>% 
   dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.5, drawGrid = FALSE) %>%
@@ -326,12 +326,13 @@ sentiment$score <- log((sentiment$positive + 0.5) / (sentiment$negative + 0.5))
 sentiment %>% 
   ggplot(aes(x = score, fill = Type)) + 
   geom_density(alpha=0.3) +
-  labs(title = "Distribution of Sentiments", subtitle = str_wrap('This graph plots the density of sentiments across all headlines, as well as the density of a targeted sentiment analysis around the name "Boris Johnson".', width = 85), x = "Sentiment Score", y = "Density")+
+  labs(title = "Distribution of Sentiments", subtitle = str_wrap('This graph plots the distribution of sentiments across all headlines, as well as the distribution of a targeted sentiment analysis around the name "Boris Johnson".', width = 85), x = "Sentiment Score", y = "Density")+
   theme_minimal() + 
   theme_minimal() +
   theme(panel.border = element_rect(color = "black",
                                     fill = NA,
                                     size = 0.3))
+ggsave("DensityPlots.png")
 
 ```
 
