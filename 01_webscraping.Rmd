@@ -45,72 +45,42 @@ pacman::p_load(tidyverse,
                tsbox,
                tm)
 
-# DO WE NEED TO LOAD TM SEPERATELY OR NOT?
 ```
-<br>
 
-<h2>
-2. Scraping Headlines by Date and Data Cleaning
-</h2>
-<div>
-<i> To examine this step in details, check the attached scraping.R file on <a href="url"> https://github.com/lauramenicacci/cop26_text_analysis/blob/e3697a69534a5e9d540bfc1913f52bd096de99ee/scraping.R</a> </i>
-</div>
+ Scraping Headlines by Date and Data Cleaning
+To examine this step in details, check the attached scraping.R file on <a href="url"> https://github.com/lauramenicacci/cop26_text_analysis/blob/e3697a69534a5e9d540bfc1913f52bd096de99ee/scraping.R</a> </i>
+
 ```{r}
 source("./scraping_and_data_cleaning.R")
 
 ```
 
-<br>
-<br>
-<h2>
+
 3. Explorative analysis
-</h2>
-<div class="comment">
-Through the wordcloud, we observed that words as "cop26", "glasgow","climate","change" were very frequent and not really useful for a sentiment analysis, so we removed them.
-PLEASE LAURA ADD OTHER RELEVANT DESCRIPTION HERE
-3.1. Frequency Table 
-<br>
-3.2. Explorative Wordcloud
-<br>
-3.3.Keyword in Context
-<br>
-</div>
-<br>
-<br>
-<h3>
+
 3.1. Frequency Table
-</h3>
+
 ```{r}
 words_list %>% 
   count(word, sort = TRUE) %>% 
   head(10)
- 
 
-#frequency plot + take most frequent words and see where they appear 
-#WE DROPPED THIS?
+ggsave("FrequencyTable.png", width = 5, height = 3)
 
 ```
-<br>
-<h3>
+
 3.2. Explorative Wordcloud
-</h3>
+
 ```{r}
 #explorative wordcloud: we see the most frequent words: if there's something useless we remove it 
 wordcloud(words_list$word, min.freq = 20, random.order = FALSE, colors=brewer.pal(8, "Dark2"))
 ```
-<div class="comment">
-<i> Exploring the most frequent words helps to remove the irrelevant ones among them by adding them to the stopwords dictionary i.e. Glasgow. EDIT PLEASE </i>
-<br>
-</div>
-<div>
-<i>Check scraping file https://github.com/lauramenicacci/cop26_text_analysis/blob/e3697a69534a5e9d540bfc1913f52bd096de99ee/scraping.R</a>
-</i>
-<br>
-</div>
-<br>
-<h3>
+ Exploring the most frequent words helps to remove the irrelevant ones among them by adding them to the stopwords dictionary i.e. Glasgow. 
+
+Check scraping file https://github.com/lauramenicacci/cop26_text_analysis/blob/e3697a69534a5e9d540bfc1913f52bd096de99ee/scraping.R</a>
+
 3.3. Keyword in Context
-</h3>
+
 ```{r}
 cop26$Headlines %>% 
   corpus() %>% 
@@ -118,25 +88,13 @@ cop26$Headlines %>%
   kwic(phrase("crisis"), window = 10) %>% 
   DT::datatable(caption = "Keywords in context", rownames = FALSE, options = list(scrollX = TRUE, pageLength = 5, lengthMenu = c(5, 10, 15, 20)))
 ```
-<br>
-<br>
-<h2>
+
 4. Sentiment analysis Using "bing" Dictionary
-</h2>
-<br>
-<div class="comment">
+
 Result: we have a dataframe with words, dates, sentiment and frequency of occurrence of those words
 first plot: we start from the general: visualize through time how sentiment changes! TO BE EDITED
 
-<br>
 4.1. Sentiment Analysis Dataframe
-<br>
-4.2. Basic Visualization
-</div>
-<br>
-<h3>
-4.1. Sentiment Analysis Dataframe
-</h3>
 ```{r}
 word_sent <- words_list %>% #we have 293 classified words
   filter(!word == "crisis") %>% #remove the word crisis before the sentiment analysis
@@ -161,10 +119,8 @@ words_list_boris<- toks_cop26 %>%
  
 
 ```
-<br>
-<h3>
+
 4.2. Basic Visualization
-</h3>
 
 ```{r}
 sc <- sentiment_complete %>% #first plot of sentiment analysis
@@ -184,32 +140,13 @@ sc %>%
 ggsave("SentimentFrequencyPlot.png", width = 5, height = 3)
 ```
 
-<br>
-<br>
 
-<h2>
 5. Exploration of Results
-</h2>
-<br>
-<div class="comment">
-PLEASE LAURA ADD DESCRIPTION HERE
 
 we try to understand which are the most used words overall. First we plot them without dates to see the overall result, then we add them in a second plot
-<br>
+
 5.1. Plot of Results
-<br>
-5.2. Summary Interactive Plot by Date
-<br>
-5.2.1. Manipulation of the Dataset into a #timeseries' Object
-<br>
-5.2.2. All Sentiment Interactive Plot by Date
-<br>
-5.2.3. Positive vs Negative Sentiment Interactive Plots by Date
-</div>
-<br>
-<h3>
-5.1. Plot of Results
-</h3>
+
 ```{r}
 sc %>% 
   drop_na() %>% 
@@ -227,13 +164,11 @@ sc %>%
                                     size = 0.3))
 ggsave("MostFrequentlyOccuringWord.png", width = 5, height = 3)
 ```
-<br>
-<h3>
+
 5.2. Summary Interactive Plots
-</h3>
-<h4>
+
 5.2.1. Manipulation of the Dataset into a 'timeseries' Object
-</h4>
+
 ```{r}
 
 sentiment_complete %>%
@@ -253,10 +188,9 @@ neutrals<-xts(counter$neutral, counter$Dates)
 timeseries <- cbind(negatives, positives,neutrals) # binding the three time series
 
 ```
-<br>
-<h4>
+
 5.2.2. All Sentiment Interactive Plot by Date
-</h4>
+
 ```{r, include=FALSE}
 dygraph(timeseries, main = "All sentiments across time", xlab = "Date", ylab = "Frequency") %>%  #the plot, unfortunately, the dates are lost so far
   dySeries("negatives", label="Negative") %>% 
@@ -268,10 +202,9 @@ dygraph(timeseries, main = "All sentiments across time", xlab = "Date", ylab = "
   dyHighlight(highlightCircleSize = 3, highlightSeriesBackgroundAlpha = 0.3, hideOnMouseOut = FALSE)  %>%
   dyRoller(rollPeriod = 1) 
 ```
-<br>
-<h4>
+
 5.2.3. Positive vs Negative Sentiment Interactive Plots by Date
-</h4>
+
 ```{r}
 
 timeseries2<-cbind(negatives, positives)
@@ -285,22 +218,11 @@ dygraph(timeseries2, main = "Positive and negative sentiments across time", xlab
   dyRoller(rollPeriod = 1)
 ```
 
-<br>
-<br>
-<h2>
+
 6. Targeted sentiment analysis
-</h2>
-<div class="comment">
-KATALIN PLEASE EDIT HERE
-<br>
+
 6.1 Sentiment Density for COP26
-<br>
-6.2 Sentiment Density, Target: Boris Johnson
-</div>
-<br>
-<h3>
-6.1 Sentiment Density for COP26
-</h3>
+
 ```{r}
 
 toks_c26 <- cop26$Headlines %>% 
