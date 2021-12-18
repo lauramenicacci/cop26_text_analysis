@@ -12,7 +12,6 @@ div.comment {font-size:14pt; background-color:#f3f0ff; border-radius: 5px; paddi
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-Hello
 ```
 <br>
 
