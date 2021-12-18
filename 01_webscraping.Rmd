@@ -149,12 +149,16 @@ sentiment_complete <- left_join(words_list, word_sent, by = "word") #join with t
 #  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) if we want to flip it 
 
 
+toks_cop26 <- cop26 %>% 
+ filter(str_detect(Headlines, "Boris Johnson")|str_detect(Headlines, "Boris") | str_detect(Headlines, "Johnson"))
 
-#add breaks is this DONE (?)
-#add interactive slider for dates DONE
-#change color
-
-
+words_list_boris<- toks_cop26 %>% 
+  unnest_tokens(word, Headlines, token = "regex", pattern = "\\s+|[[:punct:]]+") %>%
+  anti_join(customized_stopwords) %>% 
+  arrange(Dates) %>%
+  count(word, sort = TRUE) %>% 
+  head(10)
+ 
 
 ```
 <br>
@@ -168,7 +172,8 @@ sc <- sentiment_complete %>% #first plot of sentiment analysis
 
 sc$n[sc$sentiment == 'negative'] <-  -sc$n 
 
-sc %>% 
+
+sc %>%
   ggplot(aes(x = Dates, y = n, fill = sentiment))+
   geom_bar(stat = "identity", width = 0.5) +
   labs(title = "Sentiment frequency plot by date", y = "Count", x = "Date", fill = "sentiment") + geom_vline(xintercept= as.Date("2021-10-31"), linetype = "dashed", colour = "darkgrey") +
@@ -176,6 +181,7 @@ sc %>%
   theme_minimal()+ theme(panel.border = element_rect(color = "black",
                                     fill = NA,
                                     size = 0.3))
+#ggsave("SentimentFrequencyPlot.png")
 ```
 
 <br>
@@ -219,6 +225,7 @@ sc %>%
   theme(panel.border = element_rect(color = "black",
                                     fill = NA,
                                     size = 0.3))
+ggsave("MostFrequentlyOccuringWord.png")
 ```
 <br>
 <h3>
@@ -251,7 +258,7 @@ timeseries <- cbind(negatives, positives,neutrals) # binding the three time seri
 5.2.2. All Sentiment Interactive Plot by Date
 </h4>
 ```{r}
-dygraph(timeseries) %>%  #the plot, unfortunately, the dates are lost so far
+dygraph(timeseries, main = "All sentiments across time") %>%  #the plot, unfortunately, the dates are lost so far
   dySeries("negatives", label="Negative") %>% 
   dySeries("positives", label="Positive") %>% 
   dySeries("neutrals", label="Neutral") %>%
@@ -295,24 +302,22 @@ KATALIN PLEASE EDIT HERE
 6.1 Sentiment Density for COP26
 </h3>
 ```{r}
-boris <- cop26 %>% 
- filter(str_detect(Headlines, "Boris Johnson")|str_detect(Headlines, "Boris") | str_detect(Headlines, "Johnson"))
 
-c26_toks <- cop26$Headlines %>% 
+toks_c26 <- cop26$Headlines %>% 
   corpus() %>% 
   tokens()
-boris_toks <- boris$Headlines %>% 
+boris_c26 <- toks_cop26$Headlines %>% 
   corpus() %>% 
   tokens()
 
-sent_c26 <- tokens_lookup(c26_toks, dictionary = data_dictionary_LSD2015[1:2]) %>% 
+sent_c26 <- tokens_lookup(toks_c26, dictionary = data_dictionary_LSD2015[1:2]) %>% 
   dfm() %>% 
-  convert(to = "data.frame") %>% #targeted sentiment analysis for the boris words
+  convert(to = "data.frame") %>% #targeted sentiment analysis for the toks_cop26 words
   mutate(Type = "Cop26")
   
-sent_boris <- tokens_lookup(boris_toks, dictionary = data_dictionary_LSD2015[1:2]) %>% 
+sent_boris <- tokens_lookup(boris_c26, dictionary = data_dictionary_LSD2015[1:2]) %>% 
   dfm() %>% 
-  convert(to = "data.frame") %>% #targeted sentiment analysis for the boris words
+  convert(to = "data.frame") %>% #targeted sentiment analysis for the toks_cop26 words
   mutate(Type = "Boris")
 
 sentiment <- rbind(sent_c26,sent_boris)
