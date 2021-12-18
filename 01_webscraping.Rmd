@@ -181,7 +181,7 @@ sc %>%
   theme_minimal()+ theme(panel.border = element_rect(color = "black",
                                     fill = NA,
                                     size = 0.3))
-#ggsave("SentimentFrequencyPlot.png")
+ggsave("SentimentFrequencyPlot.png", width = 5, height = 3)
 ```
 
 <br>
@@ -332,7 +332,7 @@ sentiment %>%
   theme(panel.border = element_rect(color = "black",
                                     fill = NA,
                                     size = 0.3))
-ggsave("DensityPlots.png")
+ggsave("DensityPlots.png", width = 5, height = 3)
 
 ```
 
