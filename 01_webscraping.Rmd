@@ -66,11 +66,11 @@ source("./scraping_and_data_cleaning.R")
 
 ```{r}
 words_list %>% 
-  count(word, sort = TRUE) %>% 
-  head(10) %>% kbl() %>% kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, fixed_thead = T) %>% save_kable("FrequencyTable.html")
-
-png("FrequencyTable.png")
-ggsave("FrequencyTable.png", width = 5, height = 3)
+      count(word, sort = TRUE) %>% 
+      head(10) %>% 
+      kbl() %>% 
+      kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, fixed_thead = T) %>% 
+      save_kable("FrequencyTable.html")
 
 ```
 
@@ -78,8 +78,10 @@ ggsave("FrequencyTable.png", width = 5, height = 3)
 
 ```{r}
 #explorative wordcloud: we see the most frequent words: if there's something useless we remove it 
-wordcloud(words_list$word, min.freq = 20, random.order = FALSE, colors=brewer.pal(8, "Dark2"))
-
+wordcloud(words_list$word, 
+          min.freq = 20, 
+          random.order = FALSE, 
+          colors=brewer.pal(8, "Dark2"))
 
 ```
  Exploring the most frequent words helps to remove the irrelevant ones among them by adding them to the stopwords dictionary i.e. Glasgow. 
@@ -90,10 +92,10 @@ Check scraping file https://github.com/lauramenicacci/cop26_text_analysis/blob/e
 
 ```{r}
 cop26$Headlines %>% 
-  corpus() %>% 
-  tokens() %>% 
-  kwic(phrase("crisis"), window = 10) %>% 
-  DT::datatable(caption = "Keywords in context", rownames = FALSE, options = list(scrollX = TRUE, pageLength = 5, lengthMenu = c(5, 10, 15, 20)))
+      corpus() %>% 
+      tokens() %>% 
+      kwic(phrase("crisis"), window = 10) %>% 
+      DT::datatable(caption = "Keywords in context", rownames = FALSE, options = list(scrollX = TRUE, pageLength = 5, lengthMenu = c(5, 10, 15, 20)))
 ```
 
 4. Sentiment analysis Using "bing" Dictionary
@@ -103,40 +105,37 @@ first plot: we start from the general: visualize through time how sentiment chan
 
 4.1. Sentiment Analysis Dataframe
 ```{r}
-word_sent <- words_list %>% #we have 293 classified words
+words_sentiments <- words_list %>% #we have 293 classified words
   filter(!word == "crisis") %>% #remove the word crisis before the sentiment analysis
-  inner_join(get_sentiments("bing")) %>% 
-  count(word, sentiment) 
-   
-sentiment_complete <- left_join(words_list, word_sent, by = "word") #join with the main df
+      inner_join(get_sentiments("bing")) %>% 
+      count(word, sentiment) 
 
-#word_sent %>% 
-#  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) if we want to flip it 
-
-
+sentiment_complete <- left_join(words_list, words_sentiments, by = "word") #join with the main df
+    
 toks_cop26 <- cop26 %>% 
- filter(str_detect(Headlines, "Boris Johnson")|str_detect(Headlines, "Boris") | str_detect(Headlines, "Johnson"))
-
+  filter(str_detect(Headlines, "Boris Johnson")|str_detect(Headlines, "Boris") | str_detect(Headlines, "Johnson"))
+    
 words_list_boris<- toks_cop26 %>% 
   unnest_tokens(word, Headlines, token = "regex", pattern = "\\s+|[[:punct:]]+") %>%
   anti_join(customized_stopwords) %>% 
   arrange(Dates) %>%
   count(word, sort = TRUE) %>% 
   head(10)
- 
 
 ```
 
 4.2. Basic Visualization
 
 ```{r}
-sc <- sentiment_complete %>% #first plot of sentiment analysis
-  drop_na()
+sentiment_complete <- sentiment_complete %>% 
+  mutate(across(sentiment, .fns = ~replace_na(.,"neutral"))) %>%
+  mutate(across(n, .fns = ~replace_na(.,0))) 
 
-sc$n[sc$sentiment == 'negative'] <-  -sc$n 
+#first plot of sentiment analysis
+sentiment_complete$n[sentiment_complete$sentiment == 'negative'] <-  -sentiment_complete$n[sentiment_complete$sentiment == 'negative']
 
 
-sc %>%
+sentiment_complete %>% filter(sentiment != "neutral") %>%
   ggplot(aes(x = Dates, y = n, fill = sentiment))+
   geom_bar(stat = "identity", width = 0.5) +
   labs(title = "Sentiment frequency plot by date", y = "Count", x = "Date", fill = "sentiment") + geom_vline(xintercept= as.Date("2021-10-31"), linetype = "dashed", colour = "darkgrey") +
@@ -156,8 +155,8 @@ we try to understand which are the most used words overall. First we plot them w
 5.1. Plot of Results
 
 ```{r}
-sc %>% 
-  drop_na() %>% 
+sentiment_complete %>% filter(sentiment != "neutral") %>%
+  #drop_na() %>% 
   count(word, sentiment, sort = TRUE) %>% 
   group_by(sentiment) %>%
   filter(n > 4) %>% 
