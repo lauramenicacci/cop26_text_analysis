@@ -401,7 +401,6 @@ scatter_result_boris<-scatter_result_boris %>% layout(title = 'AFINN Dictionary 
                       gridwidth = 2),
          yaxis = list(title = 'Sentiment Value',
                       gridcolor = 'lightgray',
-                    
                       zerolinewidth = 1,
                       ticklen = 3,
                       gridwith = 2),

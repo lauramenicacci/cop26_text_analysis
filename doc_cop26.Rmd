@@ -100,10 +100,11 @@ To see better:
 
 ### Bing et al. visualization
 
-
 ![TimeSeriesofSentiment](./TimeSeriesofSentiment.html)
 
 ### LSD2015 visualization
+
+
 
 ### Exploration of interesting patterns
 
