@@ -48,7 +48,9 @@ pacman::p_load(tidyverse,
                kableExtra,
                magick,
                textdata, 
-               plotly)
+               plotly, 
+               htmlwidgets, 
+               htmltools)
 
 ```
 
@@ -205,7 +207,7 @@ timeseries <- cbind(negatives, positives,neutrals) # binding the three time seri
 5.2.2. All Sentiment Interactive Plot by Date
 
 ```{r, include=FALSE}
-dygraph(timeseries, main = "All sentiments across time", xlab = "Date", ylab = "Frequency") %>%  #the plot, unfortunately, the dates are lost so far
+sentiment_timeseries <- dygraph(timeseries, main = "All sentiments across time", xlab = "Date", ylab = "Frequency") %>%  #the plot, unfortunately, the dates are lost so far
   dySeries("negatives", label="Negative") %>% 
   dySeries("positives", label="Positive") %>% 
   dySeries("neutrals", label="Neutral") %>%
@@ -214,6 +216,9 @@ dygraph(timeseries, main = "All sentiments across time", xlab = "Date", ylab = "
   dyCrosshair(direction = "vertical") %>%
   dyHighlight(highlightCircleSize = 3, highlightSeriesBackgroundAlpha = 0.3, hideOnMouseOut = FALSE)  %>%
   dyRoller(rollPeriod = 1) 
+
+save_html(sentiment_timeseries, "./TimeSeriesofSentiment.html", libdir = "lib")
+
 ```
 
 5.2.3. Positive vs Negative Sentiment Interactive Plots by Date
