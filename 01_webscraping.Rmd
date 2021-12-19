@@ -47,7 +47,8 @@ pacman::p_load(tidyverse,
                tm, 
                kableExtra,
                magick,
-               textdata)
+               textdata, 
+               plotly)
 
 ```
 
@@ -78,13 +79,15 @@ words_list %>%
 
 ```{r}
 #explorative wordcloud: we see the most frequent words: if there's something useless we remove it 
+par(mar=c(0.1,0.1,0.1,0.1))
+
 wordcloud(words_list$word, 
           min.freq = 20, 
           random.order = FALSE, 
           colors=brewer.pal(8, "Dark2"))
 
 ```
- Exploring the most frequent words helps to remove the irrelevant ones among them by adding them to the stopwords dictionary i.e. Glasgow. 
+Exploring the most frequent words helps to remove the irrelevant ones among them by adding them to the stopwords dictionary i.e. Glasgow. 
 
 Check scraping file https://github.com/lauramenicacci/cop26_text_analysis/blob/e3697a69534a5e9d540bfc1913f52bd096de99ee/scraping.R</a>
 
@@ -144,6 +147,7 @@ sentiment_complete %>% filter(sentiment != "neutral") %>%
                                     fill = NA,
                                     size = 0.3),
                          plot.background = element_rect(colour ="white"))
+
 ggsave("SentimentFrequencyPlot.png", width = 5, height = 3)
 ```
 
@@ -170,6 +174,7 @@ sentiment_complete %>% filter(sentiment != "neutral") %>%
                                     fill = NA,
                                     size = 0.3),
         plot.background = element_rect(colour ="white"))
+
 ggsave("MostFrequentlyOccuringWord.png", width = 5, height = 3)
 ```
 
@@ -301,12 +306,13 @@ ggsave("DensityPlots.png", width = 5, height = 3)
 
 
 ```{r}
-#Afinn Analysis
+#AFINN Analysis
 word_sent_afinn <- words_list %>% #we have 293 classified words
   filter(!word == "crisis") %>% #remove the word crisis before the sentiment analysis
-  inner_join(get_sentiments("afinn")) %>% 
+  inner_join(get_sentiments("afinn")) %>% # to load the AFINN dataset, you have to give permission from the console if you never uploaded it yet
   count(word, value) 
    
+
 sentiment_complete_afinn <- left_join(words_list, word_sent_afinn, by = "word") #join with the main df
 
 sentiment_complete_afinn %>%
@@ -345,6 +351,8 @@ scatter_result<-scatter_result %>% layout(title = 'AFINN Dictionary Results',
          paper_bgcolor = 'rgb(255, 255, 255)',
          plot_bgcolor = 'rgb(255,255,255)')
 scatter_result
+
+
 ```
 
 ```{r}

@@ -4,6 +4,8 @@ author: "Katalin Bayer, Laura Menicacci, Nassim Zoueini"
 date: "19/12/2021"
 output: 
   html_document:
+    fig_width: 6
+    fig_height: 4
     toc: true
     toc_collapsed: true
     toc_float: true
@@ -76,14 +78,15 @@ Thanks to a frequency table and an explorative WordCloud, we visualize the most 
 
 Thanks to the keyword in context table, it is explored quickly whether any case in which the word 'crisis' has a role different from being part of the 'climate crisis' bigram is present. It is not found to be the case. Since the main topic of COP26 is exactly that of 'tackling the climate crisis', this word, despite clearly indicating a negative sentiment, does not represent relevant information. It is therefore dropped.  
 
-![FrequencyTable](./FrequencyTable.html)
-
-![WordCloud](./WordCloud.png)
-
-
 ### WordCloud
 
-![MostFrequentlyOccuringWord](./MostFrequentlyOccuringWord.png)
+Comment on wordcloud
+```{r, fig.align='center', echo= FALSE, fig.show='hold', out.width= '75%'}
+
+knitr::include_graphics("wordcloud.png")
+```
+To see better: 
+![FrequencyTable](./FrequencyTable.html)
 
 ### Keywords in context for the most frequent word
 
@@ -92,8 +95,13 @@ Thanks to the keyword in context table, it is explored quickly whether any case 
 ### Sentiment frequency
 
 ![SentimentFrequencyPlot](./SentimentFrequencyPlot.png)
+![MostFrequentlyOccuringWord](./MostFrequentlyOccuringWord.png)
+
 
 ### Bing et al. visualization
+
+
+![TimeSeriesofSentiment](./TimeSeriesofSentiment.html)
 
 ### LSD2015 visualization
 
