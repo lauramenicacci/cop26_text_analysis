@@ -1,9 +1,5 @@
 ---
 title: "Sentiment analysis of COP26-related headlines from a British outlet"
-header-includes:
-  - \usepackage{multicol}
-  - \newcommand{\btwocol}{\begin{multicols}{2}}
-  - \newcommand{\etwocol}{\end{multicols}}
 author: "Katalin Bayer, Laura Menicacci, Nassim Zoueini"
 date: "19/12/2021"
 output: 
@@ -58,9 +54,7 @@ pacman::p_load(tidyverse,
                textdata, 
                plotly, 
                htmlwidgets, 
-               htmltools,
-               subfig,
-               multicol)
+               htmltools)
 
 ```
 
