@@ -114,14 +114,9 @@ In this part, words regarding the main topic of the headlines ("cop26", "glasgow
 ## Explorative analysis 
 Through the exploration of the collected data, we aim at understanding which are the most frequent words and whether they could have a role in our investigation. 
 
-Thanks to a frequency table and an explorative WordCloud, we visualize the most frequent words. We identify 'crisis' as the most frequent word (other than the customized stopwords) used in the headlines during the COP26 period. 
+### WordCloud and frequency table
 
-Thanks to the keyword in context table, it is explored quickly whether any case in which the word 'crisis' has a role different from being part of the 'climate crisis' bigram is present. It is not found to be the case. Since the main topic of COP26 is exactly that of 'tackling the climate crisis', this word, despite clearly indicating a negative sentiment, does not represent relevant information. It is therefore dropped.  
-
-### WordCloud
-
-Comment on wordcloud
-
+Thanks to a frequency table and an explorative WordCloud, we visualize the most frequent words. We identify 'crisis' as the most frequent word (other than the customized stopwords) used in the headlines during the COP26 period. Other very 
 
 ```{r, echo = FALSE, fig.align='center'}
 #explorative wordcloud: we see the most frequent words: if there's something useless we remove it 
@@ -140,14 +135,16 @@ frequencytable <- words_list %>%
       count(word, sort = TRUE) %>% 
       head(10) %>% 
       kbl() %>% 
-      kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, fixed_thead = T)
+      kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, fixed_thead = T) 
 frequencytable
-save_kable(frequencytable, "./visualization/3_2FrequencyTable.html")
-      
 
+save_kable(frequencytable, "./visualization/3_2FrequencyTable.html")
 ```
 
 ### Keywords in context for the most frequent word
+
+Thanks to the keyword in context function from the quanteda package, it is explored quickly whether there is any case in which the word 'crisis' has a different role from being part of the 'climate crisis' bigram. It is not found to be the case. Since the main topic of COP26 is exactly that of 'tackling the climate crisis', this word, despite clearly indicating a negative sentiment, does not represent relevant information. It is therefore dropped.  
+
 ```{r, echo = FALSE, fig.align='center'}
 keywordcontext <- cop26$Headlines %>% 
       corpus() %>% 
@@ -194,10 +191,11 @@ words_list_boris<- toks_cop26 %>%
 
 ```
 
-#### Sentiment frequency
-As explained before, this dictionary included in the tidytext package classifies the words into positive or negative. 
+#### Sentiment frequency plot
 
-Applying this dictionary to our dataset resulted in assigning sentiment values to 295 words which are distributed over the examined time period. 
+As explained above, 'Bing et al.' classifies words into positive or negative. Applying this dictionary to our dataset resulted in assigning sentiment values to 295 words which are distributed over the examined time period. 
+Two vertical dashed lines have been added for visualization purposes, as to identify the specific period COP26 happened.
+
 ```{r, echo = FALSE, fig.align='center'}
 sentiment_complete <- sentiment_complete %>% 
   mutate(across(sentiment, .fns = ~replace_na(.,"neutral"))) %>%
@@ -214,7 +212,7 @@ sentiment_complete %>%
              fill = sentiment))+
   geom_bar(stat = "identity", 
            width = 0.5) +
-  labs(title = "Sentiment frequency plot by date", 
+  labs(title = "Sentiment frequency by date", 
        y = "Count", 
        x = "Date", 
        fill = "sentiment") + 
@@ -232,11 +230,15 @@ sentiment_complete %>%
 
 ggsave("./visualization/4_2SentimentFrequencyPlot.png", width = 5, height = 3)
 ```
-The graph above shows clearly that the count of word with either a positive or a negative sentiment has increased during the negotiations (October 31st – November 12th)zone delimited by two vertical bars of the graph). Yet, through this graph we cannot deduce any trend about the general sentiment found in the headlines of “The Guardian”. 
+
+The figure clearly shows that the count of words with either a positive or a negative classification has increased during the negotiations period (October 31st – November 12th). Yet, through this graph it is quite difficult to deduce any trend about the general sentiment found in the headlines of 'The Guardian'. 
 
 
-#### Most Frequently occuring Words per sentiment
-The most repeated words with a positive or a negative sentiment value can be seen in the barplot below. 
+#### Most frequently occuring Words per sentiment
+
+To take a closer look on the different frequencies of the classifide words, the following faceted barplot shows the most frequently occuring Words per sentiment. 
+The frequency has been set to be strictly higher than 4 occurrencies per day, according to the sentiment. It is noticeable that negative words seem to be more frequent than positive ones. 
+
 ```{r, echo = FALSE, fig.align='center'}
 sentiment_complete %>% filter(sentiment != "neutral") %>%
   #drop_na() %>% 
@@ -257,7 +259,7 @@ sentiment_complete %>% filter(sentiment != "neutral") %>%
 ggsave("./visualization/5_1MostFrequentlyOccuringWord.png", width = 5, height = 3)
 ```
 
-In order to have a more detailed view of the results, you can find below two interactive graphs that show the count of each type of words by date, and in a second graph, the count of classified words by dates is shown. 
+Interestingly, 'protest' is considered as a negative word, but it can be argued that here the actual function of such word is very dependent on the context and the ideological positioning with respect to the climate crisis, as many protests during COP26 aimed at demanding more effective climate action. 
 
 ```{r, echo = FALSE, fig.align='center'}
 # Manipulation of the Dataset into a 'timeseries' Object
@@ -280,12 +282,16 @@ timeseries <- cbind(negatives, positives, neutrals) # binding the three time ser
 
 ```
 
+### Taking a step back - sentiment interactive plots by date
 
-#### All Sentiment Interactive Plot by Date
+After a first glance of the Bing et al. dictionary classification, it can be worth to see how such a classification of words is plotted over time. 
+The following plots illustrate interactively the development of negative and positive words along the examined timeframe. 
+Both plots show the count of each type of words by date.
+The first one shows the negative/positive ratio over time including non-classified words, while the second one is plotted excluding them, as to get a closer look on the changes of the counts. 
 
 ```{r, echo = FALSE, fig.align='center'}
 sentiment_timeseries <- dygraph(timeseries, 
-                                main = "All sentiments across time", 
+                                main = "'The Guardian' headlines' across time (incliuding non-classified words)", 
                                 xlab = "Date", 
                                 ylab = "Frequency") %>%
   dySeries("negatives", label="Negative") %>% 
@@ -307,17 +313,15 @@ sentiment_timeseries
 save_html(sentiment_timeseries, "./visualization/5_2_2TimeSeriesofSentiment.html", libdir = "lib")
 
 ```
-Through this plot, one can clearly notice the surge of articles/words that were published during COP26 and that the prevalent speech of the guardians headlines was rather not classified.  
+Through this plot, one can clearly notice the surge of words in the headlines that were published when COP26 was actually happening, and that the prevalent speech of 'The Guardian' headlines was rather not classified.  
 
-This surge of wordcounts and prevalence of nonclassified words especially during COP could have been expected, as during this period, a local news outlet would cover extensively the negotiations and report to them in a rather non-subjective way. 
+This surge of wordcounts and prevalence of non-classified words especially during the Conference could have been expected, as during this period a local news outlet would cover extensively the negotiations and report to them in a rather non-subjective way. 
 
-
-#### Positive vs Negative Sentiment Interactive Plots by Date
 ```{r, echo = FALSE, fig.align='center'}
 
 timeseries2<-cbind(negatives, positives)
 posnegtimeseries <- dygraph(timeseries2, 
-                            main = "Positive and negative sentiments across time", 
+                            main = "'The Guardian' headlines' across time (excliuding non-classified words)", 
                             xlab = "Date", 
                             ylab = "Frequency") %>% 
   dySeries("negatives", label="Negative") %>% 
@@ -337,16 +341,25 @@ posnegtimeseries
 
 save_html(posnegtimeseries, "./visualization/5_2_3TimeSeriesofPosNegSentiment.html", libdir = "lib")
 ```
-In this second graph, only classified words are shown. It is clear that negativity is prevailing over positivity of the headlines especially after COP26. As seen in the frequently occurring negative words, words like “protest”, “limit”, “poor”, etc… are strongly mentioned the fact which leads us to ask the  following questions: In the context of COP26 are protests negative? Don’t protest movements like Fridays for future have a positive impact on the Climate Crisis? How negative and biasing are these words? 
+
+In this second graph it is clear that negativity is prevailing over positivity of the headlines, especially after COP26. 
+
+As observed in the barplot showing the most frequently occurring words, negative unigrams like 'protest', 'limit', 'poor', etc… are strongly mentioned. This fact leads us to ask the following questions: 
+ - In the context of COP26 are protests negative? 
+ - Don't protest movements like Fridays for Future have a positive impact on the climate crisis? 
+ - To which extent could these words be negative and biasing ? 
 
 
-### AFINN Visualization
+### AFINN visualization
 
 #### AFINN analysis for all headlines
 
-In order to have a better understanding on how negative/positive the used words in The Guardian’s headlines, the AFINN dictionary assigns values from -5 to +5 to the words it classifies, ranging thus from very negative to very positive respectively. 
+In order to have a better understanding on how much negative or positive are the used words in The Guardian’s headlines, we make use of the AFINN dictionary. 
 
-Plotly package is used to visualize the values of negativity and positivity. This package offers you the option to compare data by hovering over the points, so you can examine the wound count by date for each sentiment value. 
+Such lexicon assigns values from -5 to +5 to the words it classifies, ranging thus from very negative to very positive respectively. 
+
+The plotly package is used to visualize the values of negativity and positivity. This package offers the opportunity to compare data by hovering over the points ('Compare data on hover' button), making it possible to examine the word count by date for each sentiment value. 
+
 ```{r, echo = FALSE, fig.align='center'}
 #AFINN Analysis
 word_sent_afinn <- words_list %>% #we have 293 classified words
@@ -410,13 +423,15 @@ scatter_result
 htmlwidgets::saveWidget(partial_bundle(scatter_result), "./visualization/6_2AffineAnalysisC26.html")
 
 ```
-Not as bad as expected right! The negative trend seen in the results of the bing et Al dictionary looks better now after seeing that the vast majority of the classified words falls in the -2:+2 score range. 
 
-It is remarkable that not a single word was assigned a value or -5, or a value of +5. The world leaders and the guardians did not overkill the expectations of the people and on the other hand, no toxic positivity! 
+The results are not as bad as represented in the previous plots. Trying to understand the extent to which these headlines are classified negative or positively definitely provides a cleare and more consistent picture of the collected data. 
+The negative trend seen in the results of the Bing et Al. dictionary makes more sense after seeing that the vast majority of the classified words falls in the -2:+2 score range. 
+
+It is remarkable that not a single word was assigned a value or -5, or a value of +5. The reason could stand in the fact that the validation for such dictionaries has been made combining crowdsourcing, restaurant or movie reviews, or Twitter data. Therefore, words corresponding to -5 or +5 could not exactly fit the writing-style of an official newspaper. In addition, headlines in particulare do not often contain strong wordings. It could be useful here to analyse words from the articles instead.
 
 #### AFINN analysis for Boris Johnson headlines
 
-A similar application of the AFINN dictionary was applied to headlines related to Boris Johnson who seemed to be on the more negative side of the spectrum, before, during and after COP26 yet, Johnsons seems to navigate well between positivity and negativity. 
+A similar application of the AFINN dictionary was applied to headlines related to the 'Boris Johnson' bigram, which also resulted to be quite present in the outlet headlines (see WordCloud). The following plot shows the targeted sentiment analysis for such bigram. 
 
 ```{r, echo = FALSE, fig.align='center'}
 #Afinn Analysis Boris
@@ -476,13 +491,21 @@ scatter_result_boris<-scatter_result_boris %>% layout(title = 'AFINN Dictionary 
 scatter_result_boris
 
 htmlwidgets::saveWidget(partial_bundle(scatter_result_boris), "./visualization/6_3AffineAnalysisBoris.html")
-
-
 ```
+
+The last interactive plot shows well-balanced situation.
+The Prime Minister seemed to be on the more negative side of the spectrum before, during and after COP26. Yet, Johnson seems to navigate well between positivity and negativity. 
+
 
 ### LSD2015 Visualization
 
+To validate the consistency of our findings from the analysis made through the previous two dictionaries, a third dictionary - this time incorporated in the quanteda package - is used to perform the same kind of analysis. 
+To avoid repetition of similar visualization of the result, with the LSD2015 dictionary we decided to show the distribution of sentiments across all the headlines, compared with the Boris Johnson targeted analysis. 
+A distribution function of the sentiments would provide an indication above the homogeneity of the tone adopted by the newspaper. 
+
 #### Distribution of Sentiments
+
+The results of the LSD2015 sentiment analysis are fed into a logarithmic function to evaluate a final score of positivity over negativity of the used words which will allow us to see the distribution of these words. 
 ```{r, echo = FALSE, fig.align='center'}
 
 c26_tokens <- cop26$Headlines %>% 
@@ -522,9 +545,20 @@ ggsave("./visualization/6_1DensityPlots.png", width = 5, height = 3)
 
 ```
 
+As a result of the initial processing of the words, 'Boris Johnson' had earned a large spot of the headlines of the British outlet, being the Prime Minister of the host country of the COP26 negotiations. Therefore, a special study is conducted to assess the sentiment of the headlines related to the UK Prime Minister according to the used dictionaries so the reader would have an idea about the similarities and differences in the headlines related to Boris and the overall sentiment analysis of all the headlines. 
+
+
 ## Concluding remarks
 
+The research conducted above has shown that regardless of the type of dictionary used to carry out the analysis, the general sentiments are the same – in all cases, the negatives outweigh the positives. Even before COP26 had begun, we can see that the Guardian reflected a rather pessimistic outlook regarding the climate conference. Despite seeing a surge in positive sentiments right after the conference started, the sentiment frequency plot by date shows that these are still counteracted by an overwhelming number of headlines with negative sentiments. This is further supported by the results of the AFINN dictionary analysis, which indicates a similar pattern: We see the circles coming in earlier for the negative sentiments, these sentiments also occur more frequently as indicated by the circle’s size. Whilst the sentiments are not distributed uniformly across time, it can be said that at every point in time, the guardian generally reflects a negative outlook on COP26.  
+
+As an additional part of our analysis, we considered the sentiments of the COP26 headlines that mention Boris Johnson and compare the sentiment of these, with all headlines. This is captured by the plots generated using the AFINN dictionary as well as the LSD2015 dictionary. The distribution of sentiments indicates that these two categories do behave similarly; however, the headlines mentioning Boris are less polarizing, as indicated by lower peaks and higher troughs. On top of that, the tails of the density plot, indicate that amongst the negative words, there were more extreme sentiments than compared to the most positive words. Based on the AFINN dictionary we obtain the same conclusion. In the “Boris plot” we see the majority of negative sentiments are accumulated around -2, whilst the analysis for all headlines even scores some values as low as -3 and -4. 
+
+Even though the Guardian did not publish exclusively negative headlines regarding COP26, these consistently outweigh the number of positively toned headlines. We suspect this could also be partially due to the sensationalist nature of newspapers. Quite naturally, a daunting, apocalyptic headline will generate more clicks and engagement which could skew journalists into dramatized headlines. Ultimately, in our discussion of these results, we realised that the Guardian generally reflects personal attitudes towards COP26 fairly accurately. On one hand, it is encouraging to see countries joining forces and coming up with solutions as to how we can best tackle climate change, and on the other hand, we feel an increasing frustration that whilst we are taking steps into the right direction, we know that these steps are not enough. 
+
 ## Further research suggestions
+
+As stated above, we feel like a potential drawback of our research is the fact that it has been limited to headlines exclusively. Not only does this contstrain the context in which negative or positive words appear, it could also reflect an exaggerated sentiment. So, to have a more nuanced perspective on what the sentiments truly are, scraping could be expanded to include the actual articles themselves which would instantly increase our data set massively. Finally, it would have been interesting to consider the sentiment surrounding COP26 from other newspaper sources, either across the United Kingdom, or even more broadly speaking, across the world.  
 
 ## Resources
 
