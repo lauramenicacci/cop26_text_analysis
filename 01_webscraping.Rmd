@@ -65,19 +65,7 @@ source("./scraping_and_data_cleaning.R")
 
 3. Explorative analysis
 
-3.1. Frequency Table
-
-```{r}
-words_list %>% 
-      count(word, sort = TRUE) %>% 
-      head(10) %>% 
-      kbl() %>% 
-      kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, fixed_thead = T) %>% 
-      save_kable("3_1FrequencyTable.html")
-
-```
-
-3.2. Explorative Wordcloud
+3.1. Explorative Wordcloud
 
 ```{r}
 #explorative wordcloud: we see the most frequent words: if there's something useless we remove it 
@@ -91,7 +79,18 @@ wordcloud(words_list$word,
 ```
 Exploring the most frequent words helps to remove the irrelevant ones among them by adding them to the stopwords dictionary i.e. Glasgow. 
 
-Check scraping file https://github.com/lauramenicacci/cop26_text_analysis/blob/e3697a69534a5e9d540bfc1913f52bd096de99ee/scraping.R</a>
+3.2. Frequency Table
+
+```{r}
+words_list %>% 
+      count(word, sort = TRUE) %>% 
+      head(10) %>% 
+      kbl() %>% 
+      kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, fixed_thead = T) %>% 
+      save_kable("3_2FrequencyTable.html")
+
+```
+
 
 3.3. Keyword in Context
 
@@ -100,7 +99,8 @@ cop26$Headlines %>%
       corpus() %>% 
       tokens() %>% 
       kwic(phrase("crisis"), window = 10) %>% 
-      DT::datatable(caption = "Keywords in context", rownames = FALSE, options = list(scrollX = TRUE, pageLength = 5, lengthMenu = c(5, 10, 15, 20)))
+      DT::datatable(caption = "Keywords in context", rownames = FALSE, options = list(scrollX = TRUE, pageLength = 5, lengthMenu = c(5, 10, 15, 20))) %>%
+  htmlwidgets::saveWidget("3_3KeywordsInContext.html")
 ```
 
 4. Sentiment analysis Using "bing" Dictionary
@@ -124,8 +124,7 @@ words_list_boris<- toks_cop26 %>%
   unnest_tokens(word, Headlines, token = "regex", pattern = "\\s+|[[:punct:]]+") %>%
   anti_join(customized_stopwords) %>% 
   arrange(Dates) %>%
-  count(word, sort = TRUE) %>% 
-  head(10)
+  count(word, sort = TRUE)
 
 ```
 
@@ -170,7 +169,7 @@ sentiment_complete %>% filter(sentiment != "neutral") %>%
   ggplot(aes(n, word, fill = sentiment)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~ sentiment, scales = "free_y") +
-  labs(title = "Most common words affecting Sentiments", x = "Frequency", y = NULL)+
+  labs(title = "Most frequently occuring words that affect sentiments", x = "Frequency", y = NULL)+
   theme_minimal() + 
   theme(panel.border = element_rect(color = "black",
                                     fill = NA,
@@ -207,14 +206,22 @@ timeseries <- cbind(negatives, positives,neutrals) # binding the three time seri
 5.2.2. All Sentiment Interactive Plot by Date
 
 ```{r, include=FALSE}
-sentiment_timeseries <- dygraph(timeseries, main = "All sentiments across time", xlab = "Date", ylab = "Frequency") %>%  #the plot, unfortunately, the dates are lost so far
+sentiment_timeseries <- dygraph(timeseries, 
+                                main = "All sentiments across time", 
+                                xlab = "Date", 
+                                ylab = "Frequency") %>%
   dySeries("negatives", label="Negative") %>% 
   dySeries("positives", label="Positive") %>% 
   dySeries("neutrals", label="Neutral") %>%
-  dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.5, drawGrid = FALSE) %>%
+  dyOptions(labelsUTC = TRUE, 
+            fillGraph=TRUE, 
+            fillAlpha=0.5, 
+            drawGrid = FALSE) %>%
   dyRangeSelector() %>%
   dyCrosshair(direction = "vertical") %>%
-  dyHighlight(highlightCircleSize = 3, highlightSeriesBackgroundAlpha = 0.3, hideOnMouseOut = FALSE)  %>%
+  dyHighlight(highlightCircleSize = 3, 
+              highlightSeriesBackgroundAlpha = 0.3, 
+              hideOnMouseOut = FALSE)  %>%
   dyRoller(rollPeriod = 1) 
 
 save_html(sentiment_timeseries, "./5_2_2TimeSeriesofSentiment.html", libdir = "lib")
@@ -226,13 +233,21 @@ save_html(sentiment_timeseries, "./5_2_2TimeSeriesofSentiment.html", libdir = "l
 ```{r}
 
 timeseries2<-cbind(negatives, positives)
-posnegtimeseries <- dygraph(timeseries2, main = "Positive and negative sentiments across time", xlab = "Date", ylab = "Frequency") %>% 
+posnegtimeseries <- dygraph(timeseries2, 
+                            main = "Positive and negative sentiments across time", 
+                            xlab = "Date", 
+                            ylab = "Frequency") %>% 
   dySeries("negatives", label="Negative") %>% 
   dySeries("positives", label="Positive") %>%
-  dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.5, drawGrid = FALSE) %>%
+  dyOptions(labelsUTC = TRUE, 
+            fillGraph=TRUE, 
+            fillAlpha=0.5, 
+            drawGrid = FALSE) %>%
   dyRangeSelector() %>%
   dyCrosshair(direction = "vertical") %>%
-  dyHighlight(highlightCircleSize = 3, highlightSeriesBackgroundAlpha = 0.3, hideOnMouseOut = FALSE)  %>%
+  dyHighlight(highlightCircleSize = 3, 
+              highlightSeriesBackgroundAlpha = 0.3, 
+              hideOnMouseOut = FALSE)  %>%
   dyRoller(rollPeriod = 1)
 
 save_html(posnegtimeseries, "./5_2_3TimeSeriesofPosNegSentiment.html", libdir = "lib")
@@ -245,30 +260,32 @@ save_html(posnegtimeseries, "./5_2_3TimeSeriesofPosNegSentiment.html", libdir = 
 
 ```{r}
 
-toks_c26 <- cop26$Headlines %>% 
+c26_tokens <- cop26$Headlines %>% 
   corpus() %>% 
   tokens()
-boris_c26 <- toks_cop26$Headlines %>% 
+boris_tokens <- toks_cop26$Headlines %>% 
   corpus() %>% 
   tokens()
 
-sent_c26 <- tokens_lookup(toks_c26, dictionary = data_dictionary_LSD2015[1:2]) %>% 
+c26_sent <- tokens_lookup(c26_tokens, dictionary = data_dictionary_LSD2015[1:2]) %>% 
   dfm() %>% 
-  convert(to = "data.frame") %>% #targeted sentiment analysis for the toks_cop26 words
+  convert(to = "data.frame") %>% #targeted sentiment analysis for the cop26 tokens
   mutate(Type = "Cop26")
   
-sent_boris <- tokens_lookup(boris_c26, dictionary = data_dictionary_LSD2015[1:2]) %>% 
+boris_sent <- tokens_lookup(boris_tokens, dictionary = data_dictionary_LSD2015[1:2]) %>% 
   dfm() %>% 
-  convert(to = "data.frame") %>% #targeted sentiment analysis for the toks_cop26 words
+  convert(to = "data.frame") %>% #targeted sentiment analysis for the boris tokens
   mutate(Type = "Boris")
 
-sentiment <- rbind(sent_c26,sent_boris)
+sentiment <- rbind(c26_sent,boris_sent)
 sentiment$score <- log((sentiment$positive + 0.5) / (sentiment$negative + 0.5))
 
 sentiment %>% 
   ggplot(aes(x = score, fill = Type)) + 
   geom_density(alpha=0.3) +
-  labs(title = "Distribution of Sentiments", subtitle = str_wrap('This graph plots the distribution of sentiments across all headlines, as well as the distribution of a targeted sentiment analysis around the name "Boris Johnson".', width = 85), x = "Sentiment Score", y = "Density")+
+  labs(title = "Distribution of Sentiments",
+       x = "Sentiment Score", 
+       y = "Density")+
   theme_minimal() + 
   theme_minimal() +
   theme(panel.border = element_rect(color = "black",
@@ -290,28 +307,39 @@ word_sent_afinn <- words_list %>% #we have 293 classified words
 
 sentiment_complete_afinn <- left_join(words_list, word_sent_afinn, by = "word") #join with the main df
 
-sentiment_complete_afinn %>%
+sentiment_complete_afinn <- sentiment_complete_afinn %>%
   count(Dates,value) %>% 
-  mutate(across(value, .fns = ~replace_na(.,"0")))-> counter_afinn
+  mutate(across(value, .fns = ~replace_na(.,"0")))
 
-counter_afinn$value<-as.numeric(counter_afinn$value)
+sentiment_complete_afinn$value<-as.numeric(sentiment_complete_afinn$value)
 
-counter_afinn<-counter_afinn %>% 
+sentiment_complete_afinn <- sentiment_complete_afinn %>% 
   na.omit() %>%
-  filter(value!="0") 
-counter_afinn$value<- factor(counter_afinn$value, levels= c("-5","-4","-3","-2","-1","1","2","3","4","5"))
+  filter(value!="0")
+
+sentiment_complete_afinn$value <- factor(sentiment_complete_afinn$value, levels= c("-5","-4","-3","-2","-1","1","2","3","4","5"))
 
 colors <- c( "#b2182b","#d6604d", "#f4a582","#fddbc7","#d1e5f0","#92c5de","#4393c3","#2166ac") #"#2166ac","#4393c3", "#92c5de", "#d1e5f0", "#fddbc7", "#f4a582","#d6604d","#b2182b")
 #copying the colors, using https://imagecolorpicker.com/
-scatter_result<- plot_ly(counter_afinn, x = ~Dates, y = ~value, color = ~value, size = ~n, colors=colors ,sizes = c(10,40),
-        type = 'scatter', mode = 'markers',
-        marker = list(symbol = 'circle', sizemode = 'diameter',
-                      line = list(width = 1, color = 'lightgrey')),
-        text = ~paste('Count of Words', n), alpha = 1.2, #setting interactions
-        width = 750, height = 450) 
+scatter_result <- plot_ly(sentiment_complete_afinn, 
+                         x = ~Dates, 
+                         y = ~value, 
+                         color = ~value, 
+                         size = ~n, 
+                         colors= colors, 
+                         sizes = c(10,40),
+                         type = 'scatter', 
+                         mode = 'markers',
+                         marker = list(symbol = 'circle', 
+                                       sizemode = 'diameter',
+                                       line = list(width = 1, color = 'lightgrey')),
+                         text = ~paste('Count of Words', n), 
+                         alpha = 1.2, #setting interactions
+                         width = 750, 
+                         height = 450) 
 
 
-scatter_result<-scatter_result %>% layout(title = 'AFINN Dictionary Results',
+scatter_result <- scatter_result %>% layout(title = 'AFINN Dictionary Results',
          xaxis = list(title = 'Dates',
                       gridcolor = 'white',
                       range=c("2021-10-14","2021-11-20"),
@@ -326,42 +354,52 @@ scatter_result<-scatter_result %>% layout(title = 'AFINN Dictionary Results',
                       gridwith = 2),
          paper_bgcolor = 'rgb(255, 255, 255)',
          plot_bgcolor = 'rgb(255,255,255)')
+
 scatter_result
+
 htmlwidgets::saveWidget(partial_bundle(scatter_result), "6_2AffineAnalysisC26.html")
 
 ```
 
 ```{r}
 #Afinn Analysis Boris
-toks_cop26_boris<-toks_cop26 %>% 
-  unnest_tokens(word, Headlines)
-
-word_sent_afinn_boris <- toks_cop26_boris %>% 
+word_sent_afinn_boris <- words_list_boris %>% 
   filter(!word == "crisis") %>% #remove the word crisis before the sentiment analysis
   inner_join(get_sentiments("afinn")) %>% 
   count(word, value) 
    
 sentiment_boris_afinn <- left_join(words_list, word_sent_afinn_boris, by = "word") #join with the main df
 
-sentiment_boris_afinn %>%
+counter_boris_afinn <- sentiment_boris_afinn %>%
   count(Dates,value) %>% 
-  mutate(across(value, .fns = ~replace_na(.,"0")))-> counter_boris_afinn
+  mutate(across(value, .fns = ~replace_na(.,"0")))
 
+# Structuring the order of the values so that they appear in the correct order in the legend
 counter_boris_afinn$value<-as.numeric(counter_boris_afinn$value)
-
 counter_boris_afinn<-counter_boris_afinn %>% 
-  na.omit() %>%
+  #na.omit() %>%
   filter(value!="0") 
 counter_boris_afinn$value<- factor(counter_boris_afinn$value, levels= c("-5","-4","-3","-2","-1","1","2","3","4","5"))
 
-colors <- c( "#b2182b","#d6604d", "#f4a582","#fddbc7","#d1e5f0","#92c5de","#4393c3","#2166ac")
+colours <- c( "#b2182b","#d6604d", "#f4a582","#fddbc7","#d1e5f0","#92c5de","#4393c3","#2166ac")
 #copying the colors, using https://imagecolorpicker.com/
-scatter_result_boris<- plot_ly(counter_boris_afinn, x = ~Dates, y = ~value, color = ~value, size = ~n, colors=colors ,sizes = c(10,40),
-        type = 'scatter', mode = 'markers',
-        marker = list(symbol = 'circle', sizemode = 'diameter',
-                      line = list(width = 1, color = 'lightgrey')),
-        text = ~paste('Count of Words', n), alpha = 1.2,
-        width = 750, height = 450) #setting interactions
+
+scatter_result_boris<- plot_ly(counter_boris_afinn, 
+                               x = ~Dates, 
+                               y = ~value, 
+                               color = ~value, 
+                               size = ~n, 
+                               colours = colours,
+                               sizes = c(10,40),
+                               type = 'scatter', 
+                               mode = 'markers',
+                               marker = list(symbol = 'circle', 
+                                             sizemode = 'diameter',
+                                             line = list(width = 1, color = 'lightgrey')),
+                               text = ~paste('Count of Words', n), 
+                               alpha = 1.2,
+                               width = 750, 
+                               height = 450) #setting interactions
 
 
 scatter_result_boris<-scatter_result_boris %>% layout(title = 'AFINN Dictionary Results for Boris Headlines',
@@ -380,7 +418,7 @@ scatter_result_boris<-scatter_result_boris %>% layout(title = 'AFINN Dictionary 
          plot_bgcolor = 'rgb(255,255,255)')
 scatter_result_boris
 
-htmlwidgets::saveWidget(partial_bundle(scatter_result_boris), "6_3AffineAnalysisBoris.html")
+htmlwidgets::saveWidget(partial_bundle(scatter_result_boris), "TEST26_3AffineAnalysisBoris.html")
 
 
 ```

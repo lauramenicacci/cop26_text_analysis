@@ -76,18 +76,61 @@ Through the exploration of the collected data, we aim at understanding which are
 
 Thanks to a frequency table and an explorative WordCloud, we visualize the most frequent words. We identify 'crisis' as the most frequent word (other than the customized stopwords) used in the headlines during the COP26 period. 
 
-Thanks to the keyword in context table, it is explored quickly whether any case in which the word 'crisis' has a role different from being part of the 'climate crisis' bigram is present. It is not found to be the case. Since the main topic of COP26 is exactly that of 'tackling the climate crisis', this word, despite clearly indicating a negative sentiment, does not represent relevant information. It is therefore dropped.  
+Thanks to the keyword in context table, it is explored quickly whether any case in which the word 'crisis' has a role different from being part of the 'climate crisis' bigram is present. It is not found to be the case. Since the main topic of COP26 is exactly that of 'tackling the climate crisis', this word, despite clearly indicating a negative sentiment, does not represent relevant information. It is therefore dropped.
+
+```{r, echo = FALSE}
+if (!require("pacman")) install.packages("pacman")
+#if (!require("phantomjs")) webshot::install_phantomjs()
+pacman::p_load(tidyverse, 
+               rvest, 
+               stringr, 
+               xml2, 
+               quanteda, 
+               janitor, 
+               tidytext, 
+               lubridate, 
+               wordcloud, 
+               SnowballC, 
+               dygraphs, 
+               xts, 
+               tsbox,
+               tm, 
+               kableExtra,
+               magick,
+               textdata, 
+               plotly, 
+               htmlwidgets, 
+               htmltools,
+               pandoc)
+
+```
 
 ### WordCloud
 
 Comment on wordcloud
+
+![3_2wordcloud](./3_2wordcloud.png)
 ```{r, fig.align='center', echo= FALSE, fig.show='hold', out.width= '75%'}
 
-knitr::include_graphics("wordcloud.png")
+
+
+knitr::include_graphics("3_2wordcloud.png")
 ```
 To see better: 
 
-![FrequencyTable](./FrequencyTable.html)
+![FrequencyTable](./3_1FrequencyTable.html)
+
+```{r, echo = FALSE}
+keywords_context <- cop26$Headlines %>% 
+      corpus() %>% 
+      tokens() %>% 
+      kwic(phrase("crisis"), window = 10) %>% 
+      DT::datatable(caption = "Keywords in context", rownames = FALSE, options = list(scrollX = TRUE, pageLength = 5, lengthMenu = c(5, 10, 15, 20)))
+
+keywords_context
+
+htmlwidgets::saveWidget(keywords_context, "3_3KeywordsInContext.html")
+```
 
 ### Keywords in context for the most frequent word
 
@@ -95,13 +138,13 @@ To see better:
 
 ### Sentiment frequency
 
-![SentimentFrequencyPlot](./SentimentFrequencyPlot.png)
-![MostFrequentlyOccuringWord](./MostFrequentlyOccuringWord.png)
+![4_2SentimentFrequencyPlot](./4_2SentimentFrequencyPlot.png)
+![5_1MostFrequentlyOccuringWord](./5_1MostFrequentlyOccuringWord.png)
 
 
 ### Bing et al. visualization
 
-![TimeSeriesofSentiment](./TimeSeriesofSentiment.html)
+![TimeSeriesofSentiment](./5_2_2TimeSeriesofSentiment.html)
 
 ### LSD2015 visualization
 
