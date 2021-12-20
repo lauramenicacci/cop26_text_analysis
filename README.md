@@ -31,6 +31,6 @@ The material in this repository is made available under the MIT license.
 # Statement of contributions
 - Laura: Webscraping, Bing et Al Dictionary, Quanteda package, rotation on all other tasks 
 
-- Kat: Code efficiency, visualization uniformity, repo structure, rotation on all other tasks 
+- Katalin: Code efficiency, visualization uniformity, repo structure, rotation on all other tasks 
 
 - Nassim: data cleaning, AFINN dictionary, interactive plots, rotation on all other tasks 
