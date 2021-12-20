@@ -34,7 +34,7 @@ ADD CONCLUSIONS
 ```{r, echo = FALSE}
 # Loading/installing all packages required for this analysis
 if (!require("pacman")) install.packages("pacman")
-#if (!require("phantomjs")) webshot::install_phantomjs()
+#webshot::install_phantomjs()
 pacman::p_load(tidyverse, 
                rvest, 
                stringr, 
@@ -140,7 +140,7 @@ frequencytable <- words_list %>%
       kbl() %>% 
       kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, fixed_thead = T)
 frequencytable
-save_kable(frequencytable, "3_2FrequencyTable.html")
+save_kable(frequencytable, "./visualization/3_2FrequencyTable.html")
       
 
 ```
@@ -154,7 +154,7 @@ keywordcontext <- cop26$Headlines %>%
       DT::datatable(caption = "Keywords in context", rownames = FALSE, options = list(scrollX = TRUE, pageLength = 5, lengthMenu = c(5, 10, 15, 20))) 
 
 keywordcontext
-  htmlwidgets::saveWidget(keywordcontext, "3_3KeywordsInContext.html")
+  htmlwidgets::saveWidget(keywordcontext, "./visualization/3_3KeywordsInContext.html")
 ```
 
 ## Sentiment analysis 
@@ -225,7 +225,7 @@ sentiment_complete %>%
                                     size = 0.3),
                          plot.background = element_rect(colour ="white"))
 
-ggsave("4_2SentimentFrequencyPlot.png", width = 5, height = 3)
+ggsave("./visualization/4_2SentimentFrequencyPlot.png", width = 5, height = 3)
 ```
 
 #### Most Frequently occuring Words per sentiment
@@ -246,7 +246,7 @@ sentiment_complete %>% filter(sentiment != "neutral") %>%
                                     size = 0.3),
         plot.background = element_rect(colour ="white"))
 
-ggsave("5_1MostFrequentlyOccuringWord.png", width = 5, height = 3)
+ggsave("./visualization/5_1MostFrequentlyOccuringWord.png", width = 5, height = 3)
 ```
 
 ```{r, echo = FALSE}
@@ -292,7 +292,7 @@ sentiment_timeseries <- dygraph(timeseries,
 
 sentiment_timeseries
 
-save_html(sentiment_timeseries, "./5_2_2TimeSeriesofSentiment.html", libdir = "lib")
+save_html(sentiment_timeseries, "./visualization/5_2_2TimeSeriesofSentiment.html", libdir = "lib")
 
 ```
 
@@ -319,7 +319,7 @@ posnegtimeseries <- dygraph(timeseries2,
 
 posnegtimeseries
 
-save_html(posnegtimeseries, "./5_2_3TimeSeriesofPosNegSentiment.html", libdir = "lib")
+save_html(posnegtimeseries, "./visualization/5_2_3TimeSeriesofPosNegSentiment.html", libdir = "lib")
 ```
 
 ### AFINN Visualization
@@ -347,14 +347,14 @@ sentiment_complete_afinn <- sentiment_complete_afinn %>%
 
 sentiment_complete_afinn$value <- factor(sentiment_complete_afinn$value, levels= c("-5","-4","-3","-2","-1","1","2","3","4","5"))
 
-colours <- c( "#b2182b","#d6604d", "#f4a582","#fddbc7","#d1e5f0","#92c5de","#4393c3","#2166ac") #"#2166ac","#4393c3", "#92c5de", "#d1e5f0", "#fddbc7", "#f4a582","#d6604d","#b2182b")
+colours <- c( "#b2182b","#d6604d", "#f4a582","#fddbc7","#d1e5f0","#92c5de","#4393c3","#2166ac")
 #copying the colors, using https://imagecolorpicker.com/
 scatter_result <- plot_ly(sentiment_complete_afinn, 
                          x = ~Dates, 
                          y = ~value, 
                          color = ~value, 
                          size = ~n, 
-                         colours= colours, 
+                         colors = colours, 
                          sizes = c(10,40),
                          type = 'scatter', 
                          mode = 'markers',
@@ -385,7 +385,7 @@ scatter_result <- scatter_result %>% layout(title = 'AFINN Dictionary Results',
 
 scatter_result
 
-htmlwidgets::saveWidget(partial_bundle(scatter_result), "6_2AffineAnalysisC26.html")
+htmlwidgets::saveWidget(partial_bundle(scatter_result), "./visualization/6_2AffineAnalysisC26.html")
 
 ```
 
@@ -419,7 +419,7 @@ scatter_result_boris<- plot_ly(counter_boris_afinn,
                                y = ~value, 
                                color = ~value, 
                                size = ~n, 
-                               colours = colours,
+                               colors = colours,
                                sizes = c(10,40),
                                type = 'scatter', 
                                mode = 'markers',
@@ -448,7 +448,7 @@ scatter_result_boris<-scatter_result_boris %>% layout(title = 'AFINN Dictionary 
          plot_bgcolor = 'rgb(255,255,255)')
 scatter_result_boris
 
-htmlwidgets::saveWidget(partial_bundle(scatter_result_boris), "TEST26_3AffineAnalysisBoris.html")
+htmlwidgets::saveWidget(partial_bundle(scatter_result_boris), "./visualization/6_3AffineAnalysisBoris.html")
 
 
 ```
@@ -491,7 +491,7 @@ sentiment %>%
                                     size = 0.3),
         plot.background = element_rect(colour ="white"))
 
-ggsave("6_1DensityPlots.png", width = 5, height = 3)
+ggsave("./visualization/6_1DensityPlots.png", width = 5, height = 3)
 
 ```
 
