@@ -27,8 +27,8 @@ list.files(folder, pattern = ".*",full.names = TRUE)
 
 #############
 
-for (page in pages_list){
-  url_parsed <- read_html(page)
+for (pages_list in folder){
+  url_parsed <- read_html(pages_list)
   
   headings_nodes <- html_elements(url_parsed, xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "fc-date-headline", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "js-headline-text", " " ))]')
   
