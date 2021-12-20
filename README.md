@@ -29,4 +29,8 @@ Young, L. & Soroka, S. (2012). Affective News: The Automated Coding of Sentiment
 The material in this repository is made available under the MIT license.
 
 # Statement of contributions
-Katalin Bayer, Laura Menicacci and Nassim Zoueini contributed equally for this project both in terms of workflow management and coding skills, in a truly collaborative spirit. 
+- Laura: Webscraping, Bing et Al Dictionary, Quanteda package, rotation on all other tasks 
+
+- Kat: Code efficiency, visualization uniformity, repo structure, rotation on all other tasks 
+
+- Nassim: data cleaning, AFINN dictionary, interactive plots, rotation on all other tasks 
