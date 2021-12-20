@@ -34,7 +34,6 @@ ADD CONCLUSIONS
 ```{r, echo = FALSE}
 # Loading/installing all packages required for this analysis
 if (!require("pacman")) install.packages("pacman")
-#webshot::install_phantomjs()
 pacman::p_load(tidyverse, 
                rvest, 
                stringr, 
@@ -54,8 +53,11 @@ pacman::p_load(tidyverse,
                textdata, 
                plotly, 
                htmlwidgets, 
-               htmltools)
-
+               htmltools,
+               webshot)
+install_phantomjs(version = "2.1.1",
+  baseURL = "https://github.com/wch/webshot/releases/download/v0.3.1/",
+  force = FALSE)
 ```
 
 
@@ -121,7 +123,7 @@ Thanks to the keyword in context table, it is explored quickly whether any case 
 Comment on wordcloud
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='center'}
 #explorative wordcloud: we see the most frequent words: if there's something useless we remove it 
 
 par(mar=c(0.1,0.1,0.1,0.1))
@@ -133,7 +135,7 @@ wordcloud(words_list$word,
 
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='center'}
 frequencytable <- words_list %>% 
       count(word, sort = TRUE) %>% 
       head(10) %>% 
@@ -146,7 +148,7 @@ save_kable(frequencytable, "./visualization/3_2FrequencyTable.html")
 ```
 
 ### Keywords in context for the most frequent word
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='center'}
 keywordcontext <- cop26$Headlines %>% 
       corpus() %>% 
       tokens() %>% 
@@ -173,7 +175,7 @@ From the tidytext package, we use the ‘Bing et al.’  and the ‘AFINN’ dic
 From the quanteda package, the Lexicoder Sentiment Dictionary represents a more than valid alternative, due to its particular versatility with respect to sentiment analysis for political communication (Young, L. & Soroka, S., 2012). Such dictionary consists of 2,858 'negative' sentiment words and 1,709 'positive' sentiment words. The novelty of Young and Soroka approach stands in a further set of 2,860 and 1,721 negations of negative and positive words, respectively. However, we did not find such additional set useful for our research purposes.
 
 ### Bing et al. visualization
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='center'}
 words_sentiments <- words_list %>% #we have 293 classified words
   filter(!word == "crisis") %>% #remove the word crisis before the sentiment analysis
       inner_join(get_sentiments("bing")) %>% 
@@ -196,7 +198,7 @@ words_list_boris<- toks_cop26 %>%
 As explained before, this dictionary included in the tidytext package classifies the words into positive or negative. 
 
 Applying this dictionary to our dataset resulted in assigning sentiment values to 295 words which are distributed over the examined time period. 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='center'}
 sentiment_complete <- sentiment_complete %>% 
   mutate(across(sentiment, .fns = ~replace_na(.,"neutral"))) %>%
   mutate(across(n, .fns = ~replace_na(.,0))) 
@@ -235,7 +237,7 @@ The graph above shows clearly that the count of word with either a positive or a
 
 #### Most Frequently occuring Words per sentiment
 The most repeated words with a positive or a negative sentiment value can be seen in the barplot below. 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='center'}
 sentiment_complete %>% filter(sentiment != "neutral") %>%
   #drop_na() %>% 
   count(word, sentiment, sort = TRUE) %>% 
@@ -257,7 +259,7 @@ ggsave("./visualization/5_1MostFrequentlyOccuringWord.png", width = 5, height = 
 
 In order to have a more detailed view of the results, you can find below two interactive graphs that show the count of each type of words by date, and in a second graph, the count of classified words by dates is shown. 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='center'}
 # Manipulation of the Dataset into a 'timeseries' Object
 
 sentiment_complete %>%
@@ -281,7 +283,7 @@ timeseries <- cbind(negatives, positives, neutrals) # binding the three time ser
 
 #### All Sentiment Interactive Plot by Date
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='center'}
 sentiment_timeseries <- dygraph(timeseries, 
                                 main = "All sentiments across time", 
                                 xlab = "Date", 
@@ -311,7 +313,7 @@ This surge of wordcounts and prevalence of nonclassified words especially during
 
 
 #### Positive vs Negative Sentiment Interactive Plots by Date
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='center'}
 
 timeseries2<-cbind(negatives, positives)
 posnegtimeseries <- dygraph(timeseries2, 
@@ -345,7 +347,7 @@ In this second graph, only classified words are shown. It is clear that negativi
 In order to have a better understanding on how negative/positive the used words in The Guardian’s headlines, the AFINN dictionary assigns values from -5 to +5 to the words it classifies, ranging thus from very negative to very positive respectively. 
 
 Plotly package is used to visualize the values of negativity and positivity. This package offers you the option to compare data by hovering over the points, so you can examine the wound count by date for each sentiment value. 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='center'}
 #AFINN Analysis
 word_sent_afinn <- words_list %>% #we have 293 classified words
   filter(!word == "crisis") %>% #remove the word crisis before the sentiment analysis
@@ -416,7 +418,7 @@ It is remarkable that not a single word was assigned a value or -5, or a value o
 
 A similar application of the AFINN dictionary was applied to headlines related to Boris Johnson who seemed to be on the more negative side of the spectrum, before, during and after COP26 yet, Johnsons seems to navigate well between positivity and negativity. 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='center'}
 #Afinn Analysis Boris
 word_sent_afinn_boris <- words_list_boris %>% 
   filter(!word == "crisis") %>% #remove the word crisis before the sentiment analysis
@@ -481,7 +483,7 @@ htmlwidgets::saveWidget(partial_bundle(scatter_result_boris), "./visualization/6
 ### LSD2015 Visualization
 
 #### Distribution of Sentiments
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='center'}
 
 c26_tokens <- cop26$Headlines %>% 
   corpus() %>% 
