@@ -193,6 +193,9 @@ words_list_boris<- toks_cop26 %>%
 ```
 
 #### Sentiment frequency
+As explained before, this dictionary included in the tidytext package classifies the words into positive or negative. 
+
+Applying this dictionary to our dataset resulted in assigning sentiment values to 295 words which are distributed over the examined time period. 
 ```{r, echo = FALSE}
 sentiment_complete <- sentiment_complete %>% 
   mutate(across(sentiment, .fns = ~replace_na(.,"neutral"))) %>%
@@ -227,8 +230,11 @@ sentiment_complete %>%
 
 ggsave("./visualization/4_2SentimentFrequencyPlot.png", width = 5, height = 3)
 ```
+The graph above shows clearly that the count of word with either a positive or a negative sentiment has increased during the negotiations (October 31st – November 12th)zone delimited by two vertical bars of the graph). Yet, through this graph we cannot deduce any trend about the general sentiment found in the headlines of “The Guardian”. 
+
 
 #### Most Frequently occuring Words per sentiment
+The most repeated words with a positive or a negative sentiment value can be seen in the barplot below. 
 ```{r, echo = FALSE}
 sentiment_complete %>% filter(sentiment != "neutral") %>%
   #drop_na() %>% 
@@ -248,6 +254,8 @@ sentiment_complete %>% filter(sentiment != "neutral") %>%
 
 ggsave("./visualization/5_1MostFrequentlyOccuringWord.png", width = 5, height = 3)
 ```
+
+In order to have a more detailed view of the results, you can find below two interactive graphs that show the count of each type of words by date, and in a second graph, the count of classified words by dates is shown. 
 
 ```{r, echo = FALSE}
 # Manipulation of the Dataset into a 'timeseries' Object
@@ -270,7 +278,9 @@ timeseries <- cbind(negatives, positives, neutrals) # binding the three time ser
 
 ```
 
+
 #### All Sentiment Interactive Plot by Date
+
 ```{r, echo = FALSE}
 sentiment_timeseries <- dygraph(timeseries, 
                                 main = "All sentiments across time", 
@@ -295,6 +305,10 @@ sentiment_timeseries
 save_html(sentiment_timeseries, "./visualization/5_2_2TimeSeriesofSentiment.html", libdir = "lib")
 
 ```
+Through this plot, one can clearly notice the surge of articles/words that were published during COP26 and that the prevalent speech of the guardians headlines was rather not classified.  
+
+This surge of wordcounts and prevalence of nonclassified words especially during COP could have been expected, as during this period, a local news outlet would cover extensively the negotiations and report to them in a rather non-subjective way. 
+
 
 #### Positive vs Negative Sentiment Interactive Plots by Date
 ```{r, echo = FALSE}
@@ -321,10 +335,16 @@ posnegtimeseries
 
 save_html(posnegtimeseries, "./visualization/5_2_3TimeSeriesofPosNegSentiment.html", libdir = "lib")
 ```
+In this second graph, only classified words are shown. It is clear that negativity is prevailing over positivity of the headlines especially after COP26. As seen in the frequently occurring negative words, words like “protest”, “limit”, “poor”, etc… are strongly mentioned the fact which leads us to ask the  following questions: In the context of COP26 are protests negative? Don’t protest movements like Fridays for future have a positive impact on the Climate Crisis? How negative and biasing are these words? 
+
 
 ### AFINN Visualization
 
 #### AFINN analysis for all headlines
+
+In order to have a better understanding on how negative/positive the used words in The Guardian’s headlines, the AFINN dictionary assigns values from -5 to +5 to the words it classifies, ranging thus from very negative to very positive respectively. 
+
+Plotly package is used to visualize the values of negativity and positivity. This package offers you the option to compare data by hovering over the points, so you can examine the wound count by date for each sentiment value. 
 ```{r, echo = FALSE}
 #AFINN Analysis
 word_sent_afinn <- words_list %>% #we have 293 classified words
@@ -388,8 +408,13 @@ scatter_result
 htmlwidgets::saveWidget(partial_bundle(scatter_result), "./visualization/6_2AffineAnalysisC26.html")
 
 ```
+Not as bad as expected right! The negative trend seen in the results of the bing et Al dictionary looks better now after seeing that the vast majority of the classified words falls in the -2:+2 score range. 
+
+It is remarkable that not a single word was assigned a value or -5, or a value of +5. The world leaders and the guardians did not overkill the expectations of the people and on the other hand, no toxic positivity! 
 
 #### AFINN analysis for Boris Johnson headlines
+
+A similar application of the AFINN dictionary was applied to headlines related to Boris Johnson who seemed to be on the more negative side of the spectrum, before, during and after COP26 yet, Johnsons seems to navigate well between positivity and negativity. 
 
 ```{r, echo = FALSE}
 #Afinn Analysis Boris
