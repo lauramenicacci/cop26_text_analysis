@@ -7,6 +7,7 @@ pageurl <- paste0(seq(1, 33, 1))
 pages_list <- paste0(baseurl, pageurl)
 pages_list[1:5] #33 pages until 18 oct = 2 weeks before cop 
 headlineslist <- c()
+dateslist <- c()
 
 ################################################################################
 # If you would like to download the scraped headlines, execute the code below,
@@ -34,8 +35,8 @@ headlineslist <- c()
 
 ################################################################################
 
-for (pages_list in folder){
-  url_parsed <- read_html(pages_list)
+for (pages in pages_list){
+  url_parsed <- read_html(pages)
   
   headings_nodes <- html_elements(url_parsed, xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "fc-date-headline", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "js-headline-text", " " ))]')
   
