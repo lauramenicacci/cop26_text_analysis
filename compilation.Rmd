@@ -1,6 +1,6 @@
 ---
 title: "Sentiment analysis of COP26-related headlines from a British outlet"
-author: "Katalin Bayer, Laura Menicacci, Nassim Zoueini"
+author: "Katalin Bayer (katasbayer@gmail.com) , Laura Menicacci (laura@menicacci.eu), Nassim Zoueini (nassim.zoueini@live.com) "
 date: "19/12/2021"
 output: 
   html_document:
@@ -23,13 +23,18 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ## Quantitative Text Analysis of 'The Guardian' headlines
 
 ### Executive summary
+
 The following report presents a quantitative text analysis of "The Guardian" newspaper's headlines in the periods going from 18 October 2021 and 28 November 2021 to apply a sentiment analysis around the negotiations of COP26 that took place in Glasgow from October 31st and November 12th. Such descriptive analysis aims at finding eventual changes in the opinions and/or political positioning of the abovementioned media outlet. 
-ADD CONCLUSIONS 
 
 ### Statement of contributions 
- - Laura
- - Kat
- - Nassim
+The load has been equally distributed among the team members. The work included following main tasks: webscraping, data cleaning, sentiment analysis, visualization and reporting.The structure of our project allowed us to equally divide the work on a rotation scheme where each person started a task that was later on commented and improved by the two others. 
+
+- Laura: Webscraping, Bing et Al Dictionary, Quanteda package, rotation on all other tasks 
+
+- Kat: Code efficiency, visualization uniformity, repo structure, rotation on all other tasks 
+
+- Nassim: data cleaning, AFINN dictionary, interactive plots, rotation on all other tasks 
+
 
 ```{r, echo = FALSE}
 # Loading/installing all packages required for this analysis
@@ -66,37 +71,34 @@ The 26th Conference of the Parties that took place in Glasgow has represented a 
 
 The majority of the most influential international leaders attended the event to discuss on future global action regarding climate mitigation and adaptation, together with non-state actors and internationally renowned personalities. Such occasion gained substantial media attention from all over the world, with peaks in the intervals right before the starting of the COP (the so-called 'PreCOP' events), during the actual happening of the Conference, and right after the conclusion of such event.  
 
-However, media outlets would approach climate change in different ways that reflect their political positioning: the headlines, the highlights as well as the frequently mentioned topics would differ based on political position.  
+Media outlets would approach climate change diffrently  to reflect their political positioning: the headlines, the highlights as well as the frequently mentioned topics would differ based on political position.  
 
-We collect data from the headlines of a British newspaper to analyse possible trends and changes in sentiment along the specific timeframe that goes from the weeks right before the Conference until the period right after it.  
+We collect data from the headlines of a British newspaper to discover potential trends and changes in sentiment along the specific timeframe that goes from the weeks right before the Conference until the period right after it.   
 
 ### Motivation
-As public policy students concerned about climate negotiations, we are interested in investigating the opinions and attitudes expressed by media outlets in the above-mentioned periods of time. We are mainly concerned on whether the standpoint and the perspective of media outlets changed over time, and how the trends of this change could have developed.   
+As public policy students concerned with the climate negotiations, we are interested in investigating the opinions and attitudes expressed by media outlets in the above-mentioned periods of time. The main concern here is to unveil the attitude adopted by the media outlet, as the tone of the headlines influences the public opinion. Would these trends change before and after the negotiations are held? 
 
-The relevance of our analysis stands in our curiosity for newspapers’ behavior concerning international, critical occasions as the COP26. Understanding whether they actually aim to inform people with the addition of a particular sentiment (that could also aim at reflecting a general feeling from the readers), or whether they prefer to remain neutral and objectively report factual events, could foster a deeper comprehension of the role of information and media in climate change developments.  
+The relevance of our analysis stands in our curiosity for newspapers’ behavior concerning international, critical occasions as the COP26. Do media outlets aim to inform people with the addition of a particular sentiment (that could also aim at reflecting a general feeling from the readers)? Or do theyprefer to remain neutral and objectively report factual events? A better understanding of this question and answering it on a data-driven approach could foster a deeper comprehension of the role of information and media in climate change developments.  
 
-To accomplish that, we decided to analyse the sentiment of just one media outlet that is published in the COP26 host country, UK, that is The Guardian. This newspaper is considered as a left-leaning, according to [YouGov](https://yougov.co.uk/topics/politics/articles-reports/2017/03/07/how-left-or-right-wing-are-uks-newspapers) findings. For instance, topics as climate financing were among the most critical ones put on the table of COP26 negotiations, hence choosing a non-neutral outlet - which would have endorsed such topic - can show more compelling results in terms of changes in the political positioning with respect to the outcomes of the Conference, that can eventually be reflected in the headlines.   
+To formulate a better understanding on these dynamics, we decided to analyze the sentiment of a single media outlet “The Guardian" published in the COP26 host country, the UK. This newspaper is more left-leaning, according to the findings of [YouGov](https://yougov.co.uk/topics/politics/articles-reports/2017/03/07/how-left-or-right-wing-are-uks-newspapers). On the table of COP26, Climate Financing was a hot topic. With the new American administration, the world leaders were looking forward to sense changes on the level of climate financing and discussing losses. hence choosing a non-neutral media outlet - which would have endorsed such topic - can show more compelling results in terms of changes in the political positioning with respect to the outcomes of the Conference, and that can eventually be reflected in the headlines. 
  
-
 ### Research question
-The principal objective of this research aims at analysing trends in the attitude of the newspaper headlines with respect to COP26 topics. Then, the other questions related to this analysis are related to two macro areas. 
-The first one tackles the original and main interest, that is whether the ratio of positive and negative words changes over time, and in which period this eventually happens. Questions related to this area are: 
+The principal objective of this research aims at analyzing trends in the attitude of the newspaper headlines with respect to COP26 topics. Then, the other questions related to this analysis are related to two macro areas.  
 
- - Are the words used in the headlines of 'The Guardian' providing a specific sentiment? 
- - What is the ratio of positive over negative words in the collected data? Does this ratio changes over time? 
- - Overall, is this sentiment more positive or negative? Which are the most positive and negative words? 
- - Are there any possible interesting patterns among the most frequent words that could be inspected further? 
+The first area has both quantitative and qualitative natures: 
+ - Do the words used in the headlines of 'The Guardian' spread a specific sentiment?  
+ - What is the ratio of positive over negative words in the collected data? Does this ratio changes over time?  
+ - Are there any possible interesting patterns among the most frequent words that could be inspected further?  
 
-The second area concerns a more specific analysis that also takes into account how such results could change when using different measurement instruments, in this case, dictionaries. Questions related to this area are: 
-
- - Is the sentiment analysis consistent across different dictionaries?
- - Do any differences and/or overlaps induce any political interpretation? Are the results relevant for political interpretation? 
+The second area concerns a more specific analysis that also takes into account how such results could change when using different measurement instruments, in this case, dictionaries.  
+ - Is the sentiment analysis consistent across different dictionaries? 
+ - Do any differences and/or overlaps induce any political interpretation? And are the results relevant for political interpretation?  
 
 ### Methods
-The text analysis is performed mainly using two different packages: tidytext and quanteda. Both packages follow the tidyverse design philosophy. The main difference between these two tools is that quanteda works with Corpus objects, proper of the NLP logic, while tidytext can process texts in their character format. We employed both tools to carry on all of our research questions in the most appropriate way. Specifically, tidytext was useful to build analyses and visualizations with dates, in a simpler manner than with the quanteda document level variables. The quanteda package was instead particularly useful for the targeted sentiment analysis we conducted, together with the fact that it was possible to check the consistency of results also with another dictionary, the LSD2015 one. The keywords in context function was also used as an explorative tool. 
+The text analysis is performed mainly using three different packages: tidytext, tidytextdata and quanteda. These packages follow the tidyverse design philosophy. The main difference between these tools is that quanteda works with Corpus objects, proper of the NLP logic, while tidytext and tidytextdata can process texts in their character format. As these tools serve well our research objectives, the study used each one of them to emphasize on specific outcomes and compare the results. Specifically, tidytext and tidytextdata are useful to build analyses and visualizations with dates, in a less complicated way than with the quanteda document level variables. The quanteda package is particularly useful for the targeted sentiment analysis we conducted, together with the fact that it was possible to check the consistency of results also with another dictionary, the LSD2015 one. The keywords in context function were also used as an explorative tool.  
 
 ### Limitations 
-Being a newspaper of the host country of the climate negotiations, The Guardian would not represent an ideal sample of headlines that would allow us to deduce if COP26 has met the expectations or not through the sentiment analysis. Indeed, the results would only show the changes in opinions for the specific political leaning that such outlet represents. However, the values of this project are to apply procedures of sentiment analysis after scraping information from the web and present them to the user in an accessible format. Therefore, it is necessary to acknowledge the very limited scope of this analysis. The relevance of such investigation can only be applied to this specific and small sample.   
+Being a newspaper of the host country of the climate negotiations, The Guardian would not represent an ideal sample of headlines that would allow us to deduce if COP26 has met the expectations or not through the sentiment analysis. Indeed, the results would only show the changes in opinions for the specific political leaning that such outlet represents. However, the value of this project isto apply procedures of sentiment analysis after scraping information from the web and present the results to the user in an accessible format. Therefore, it is necessary to acknowledge the very limited scope of this analysis. The relevance of such investigation can only be applied to this specific and small sample.   
 
 Additionally, a further limitation concerns the dates that have been scraped from The Guardian website. Given the used web-scraping strategy, the most recent dates (December and end of November 2021) present some missing values caused by a heterogeneous format in the website pages. For demonstration purposes we simply dropped those missing values, further limiting the scope of the analysis.  
 
@@ -107,9 +109,11 @@ The webscraping, cleaning and formatting section of the analysis can be found in
 source("./scraping_and_data_cleaning.R")
 
 ```
-The webscraping strategy adopted consists in downloading the headlines from multiple pages of the newspaper website by  date (static webscraping). 
-The formatting step includes transformation of dates into the correct format with lubridate and and data preparation for the quantitative text analysis with tidytext. 
-In this part, words regarding the main topic of the headlines ("cop26", "glasgow","climate","change") were expected to be very frequent, other than not contributing to a specific senitment, so they have been removed as stopwords. 
+The webscraping strategy adopted consists in downloading the headlines from multiple pages of the newspaper website by date (static webscraping).  
+
+The formatting step includes transformation of dates into the correct format with lubridate and and data preparation for the quantitative text analysis with tidytext.  
+
+In this part, words regarding the main topic of the headlines ("cop26", "glasgow","climate","change") were expected to be very frequent, and were removed from the very beginning as customized stopwords since they do not contribute to the sentiment. 
 
 ## Explorative analysis 
 Through the exploration of the collected data, we aim at understanding which are the most frequent words and whether they could have a role in our investigation. 
@@ -143,7 +147,7 @@ save_kable(frequencytable, "./visualization/3_2FrequencyTable.html")
 
 ### Keywords in context for the most frequent word
 
-Thanks to the keyword in context function from the quanteda package, it is explored quickly whether there is any case in which the word 'crisis' has a different role from being part of the 'climate crisis' bigram. It is not found to be the case. Since the main topic of COP26 is exactly that of 'tackling the climate crisis', this word, despite clearly indicating a negative sentiment, does not represent relevant information. It is therefore dropped.  
+Based on a generated context table thanks to the keyword in context function from the quanteda package, the word crisis could be easily identified to be always used as part of the bigram “climate crisis” which is the core subject of the climate negotiations. As the word crisis has a negative effect on the overall sentiment analysis, we decided to drop it since the context in which it is being used was shown to be informative rather than sentiment-related.  
 
 ```{r, echo = FALSE, fig.align='center'}
 keywordcontext <- cop26$Headlines %>% 
@@ -157,19 +161,18 @@ keywordcontext
 ```
 
 ## Sentiment analysis 
-The sentiment analysis applied to the collected headlines is conducted using a dictionary-based method. The three used dictionaries are:  
-
+The sentiment analysis applied to the collected headlines is conducted using a dictionary-based method. The three used dictionaries are:   
  - ‘Bing et Al.’,  
-
- - ‘AFINN’  
-
+ - ‘AFINN’, 
  - ‘Lexicoder Sentiment Dictionary’ (LSD2015) 
 
 The choice of these dictionaries is mainly based on common practice and on the objective of our research to check the sentiment of the headlines around the climate negotiations, quantify them and detect any potential patterns and the consistency of these results. 
 
 From the tidytext package, we use the ‘Bing et al.’  and the ‘AFINN’ dictionaries. These are general-purpose lexicons based on unigrams (single words). The first one classifies the words into negative or positive, while the second one scales the sentiment by assigning a value between a range of -5 and +5, classifying words with values very negative and very positive respectively.  
 
-From the quanteda package, the Lexicoder Sentiment Dictionary represents a more than valid alternative, due to its particular versatility with respect to sentiment analysis for political communication (Young, L. & Soroka, S., 2012). Such dictionary consists of 2,858 'negative' sentiment words and 1,709 'positive' sentiment words. The novelty of Young and Soroka approach stands in a further set of 2,860 and 1,721 negations of negative and positive words, respectively. However, we did not find such additional set useful for our research purposes.
+From the quanteda package, the Lexicoder Sentiment Dictionary represents a more than valid alternative, due to its particular versatility with respect to sentiment analysis for political communication (Young, L. & Soroka, S., 2012). Such dictionary consists of 2,858 "negative" sentiment words and 1,709 "positive" sentiment words. The novelty of Young and Soroka approach stands in a further set of 2,860 and 1,721 negations of negative and positive words, respectively. However, we did not find such additional set useful for our research purposes.  
+
+As a result of the initial processing of the words, “Boris Johnson” had earned a large spot of the headlines of the British outlet, being the Prime Minister of the host country of the COP26 negotiations. Therefore, a special study is conducted to assess the sentiment of the headlines related to the UK Prime Minister. By applying such a comparative study based on the used dictionaries, the readers would have an idea about the similarities and differences in the sentiment of the headlines related to Boris and the overall sentiment analysis. 
 
 ### Bing et al. visualization
 ```{r, echo = FALSE, fig.align='center'}
@@ -259,7 +262,7 @@ sentiment_complete %>% filter(sentiment != "neutral") %>%
 ggsave("./visualization/5_1MostFrequentlyOccuringWord.png", width = 5, height = 3)
 ```
 
-Interestingly, 'protest' is considered as a negative word, but it can be argued that here the actual function of such word is very dependent on the context and the ideological positioning with respect to the climate crisis, as many protests during COP26 aimed at demanding more effective climate action. 
+The first noticeable fact is that the word 'protest' appears twice in the negative words. This is because, due to our small dataset, the stemming part of the pre-processing was not carried out. Interestingly, 'protest' is considered as a negative word, but it can be argued that here the actual function of such word is very dependent on the context and the political positioning with respect to the climate crisis, as many protests during COP26 aimed at demanding more effective climate action. 
 
 ```{r, echo = FALSE, fig.align='center'}
 # Manipulation of the Dataset into a 'timeseries' Object
@@ -282,16 +285,16 @@ timeseries <- cbind(negatives, positives, neutrals) # binding the three time ser
 
 ```
 
-### Taking a step back - sentiment interactive plots by date
+### Sentiment interactive plots by date
 
-After a first glance of the Bing et al. dictionary classification, it can be worth to see how such a classification of words is plotted over time. 
+After a first glance of the Bing et al. dictionary classification, it can be worth to take a step back and see how such a classification of words is plotted over time. 
 The following plots illustrate interactively the development of negative and positive words along the examined timeframe. 
 Both plots show the count of each type of words by date.
-The first one shows the negative/positive ratio over time including non-classified words, while the second one is plotted excluding them, as to get a closer look on the changes of the counts. 
+The first one shows the negative/positive ratio over time including non-classified words, while the second one is plotted excluding them, as to get a closer look on the changes of the counts for positive and negative classifications. 
 
 ```{r, echo = FALSE, fig.align='center'}
 sentiment_timeseries <- dygraph(timeseries, 
-                                main = "'The Guardian' headlines' across time (incliuding non-classified words)", 
+                                main = "Sentiment across time (including non-classified words)", 
                                 xlab = "Date", 
                                 ylab = "Frequency") %>%
   dySeries("negatives", label="Negative") %>% 
@@ -321,7 +324,7 @@ This surge of wordcounts and prevalence of non-classified words especially durin
 
 timeseries2<-cbind(negatives, positives)
 posnegtimeseries <- dygraph(timeseries2, 
-                            main = "'The Guardian' headlines' across time (excliuding non-classified words)", 
+                            main = "Sentiment across time (excluding non-classified words)", 
                             xlab = "Date", 
                             ylab = "Frequency") %>% 
   dySeries("negatives", label="Negative") %>% 
@@ -342,7 +345,7 @@ posnegtimeseries
 save_html(posnegtimeseries, "./visualization/5_2_3TimeSeriesofPosNegSentiment.html", libdir = "lib")
 ```
 
-In this second graph it is clear that negativity is prevailing over positivity of the headlines, especially after COP26. 
+In this second graph, it is clear that negativity is prevailing over positivity of the headlines, especially after COP26. 
 
 As observed in the barplot showing the most frequently occurring words, negative unigrams like 'protest', 'limit', 'poor', etc… are strongly mentioned. This fact leads us to ask the following questions: 
  - In the context of COP26 are protests negative? 
@@ -361,7 +364,7 @@ Such lexicon assigns values from -5 to +5 to the words it classifies, ranging th
 The plotly package is used to visualize the values of negativity and positivity. This package offers the opportunity to compare data by hovering over the points ('Compare data on hover' button), making it possible to examine the word count by date for each sentiment value. 
 
 ```{r, echo = FALSE, fig.align='center'}
-#AFINN Analysis
+
 word_sent_afinn <- words_list %>% #we have 293 classified words
   filter(!word == "crisis") %>% #remove the word crisis before the sentiment analysis
   inner_join(get_sentiments("afinn")) %>% # to load the AFINN dataset, you have to give permission from the console if you never uploaded it yet
@@ -545,20 +548,38 @@ ggsave("./visualization/6_1DensityPlots.png", width = 5, height = 3)
 
 ```
 
-As a result of the initial processing of the words, 'Boris Johnson' had earned a large spot of the headlines of the British outlet, being the Prime Minister of the host country of the COP26 negotiations. Therefore, a special study is conducted to assess the sentiment of the headlines related to the UK Prime Minister according to the used dictionaries so the reader would have an idea about the similarities and differences in the headlines related to Boris and the overall sentiment analysis of all the headlines. 
-
 
 ## Concluding remarks
 
-The research conducted above has shown that regardless of the type of dictionary used to carry out the analysis, the general sentiments are the same – in all cases, the negatives outweigh the positives. Even before COP26 had begun, we can see that the Guardian reflected a rather pessimistic outlook regarding the climate conference. Despite seeing a surge in positive sentiments right after the conference started, the sentiment frequency plot by date shows that these are still counteracted by an overwhelming number of headlines with negative sentiments. This is further supported by the results of the AFINN dictionary analysis, which indicates a similar pattern: We see the circles coming in earlier for the negative sentiments, these sentiments also occur more frequently as indicated by the circle’s size. Whilst the sentiments are not distributed uniformly across time, it can be said that at every point in time, the guardian generally reflects a negative outlook on COP26.  
+The research conducted above has shown that the general sentiments are consistent across all dictionaries used in the analysis – in all cases, the negatives outweigh the positives. Even before COP26 had begun, we can see that the Guardian reflected a rather pessimistic outlook regarding the climate conference.  
 
-As an additional part of our analysis, we considered the sentiments of the COP26 headlines that mention Boris Johnson and compare the sentiment of these, with all headlines. This is captured by the plots generated using the AFINN dictionary as well as the LSD2015 dictionary. The distribution of sentiments indicates that these two categories do behave similarly; however, the headlines mentioning Boris are less polarizing, as indicated by lower peaks and higher troughs. On top of that, the tails of the density plot, indicate that amongst the negative words, there were more extreme sentiments than compared to the most positive words. Based on the AFINN dictionary we obtain the same conclusion. In the “Boris plot” we see the majority of negative sentiments are accumulated around -2, whilst the analysis for all headlines even scores some values as low as -3 and -4. 
+Quantitative interpretation: 
 
-Even though the Guardian did not publish exclusively negative headlines regarding COP26, these consistently outweigh the number of positively toned headlines. We suspect this could also be partially due to the sensationalist nature of newspapers. Quite naturally, a daunting, apocalyptic headline will generate more clicks and engagement which could skew journalists into dramatized headlines. Ultimately, in our discussion of these results, we realised that the Guardian generally reflects personal attitudes towards COP26 fairly accurately. On one hand, it is encouraging to see countries joining forces and coming up with solutions as to how we can best tackle climate change, and on the other hand, we feel an increasing frustration that whilst we are taking steps into the right direction, we know that these steps are not enough. 
+ - Whilst the sentiments are not distributed uniformly across time, it can be said that at every point in time, the guardian generally reflects a negative outlook on COP26. 
+ - Based on the AFINN dictionary analysis we observe a similar pattern: despite an initial surge in positive sentiments when COP26 began, these were still counteracted by an overwhelming number of headlines with negative sentiments. 
+ - The distribution of sentiments of all headlines vs. those including “Boris Johnson” do behave similarly, the headlines mentioning Boris are less polarizing, as indicated by lower peaks and higher troughs.  
+ - On top of that, the tails of the density plot show that amongst the negative words there were more extreme sentiments, compared to the most positive words.  
+
+Qualitative interpretation: 
+
+ - The three dictionaries presented a consistent result for the sentiment analysis of the scraped headlines.
+ - Due to the project limitations, a further topic modeling could not be conducted to associate a prevalent sentiment to specific topics. 
+ - The speeches related to Boris Johnson (a politician) were demonstrated to be less sharply sentimental whereas a clear separation of the sentiments shows in the overall sentiment of the headlines. 
+ - The trend of negativity in a month time window around COP26 did not change considerably before and after, which could be justified by the already increasing negativity around the topic. 
+
+
+We suspect that this overall negative tone could be partially due to the sensationalist nature of newspaper headlines. Quite naturally, a daunting, apocalyptic headline will generate more clicks and engagement which could skew journalists into dramatized headlines. Ultimately, in our discussion of these results, we realised that the Guardian generally reflects our personal attitudes towards COP26 accurately. On one hand, it is encouraging to see countries joining forces and finding solutions as to how we can best tackle climate change, and on the other hand, we feel an increasing frustration that whilst we are taking steps into the right direction, we know that these steps are not enough. 
 
 ## Further research suggestions
 
-As stated above, we feel like a potential drawback of our research is the fact that it has been limited to headlines exclusively. Not only does this contstrain the context in which negative or positive words appear, it could also reflect an exaggerated sentiment. So, to have a more nuanced perspective on what the sentiments truly are, scraping could be expanded to include the actual articles themselves which would instantly increase our data set massively. Finally, it would have been interesting to consider the sentiment surrounding COP26 from other newspaper sources, either across the United Kingdom, or even more broadly speaking, across the world.  
+As stated above, we feel like a potential drawback of our research is the fact that it has been limited to headlines exclusively. Not only does this constrain the context in which negative or positive words appear, it could also reflect an exaggerated sentiment. So, to have a more nuanced perspective on what the sentiments truly are, scraping could be expanded to include the actual articles themselves which would instantly increase our data set massively. This expansion would then help us to dig deeper into the topics from these articles and then apply a targeted sentiment analysis to these topics and associate a sentiment to each topic. 
+
+Finally, it would have been interesting to consider the sentiment surrounding COP26 from other newspaper sources, either across the United Kingdom, or even more broadly speaking, across the world over a larger time period.    
 
 ## Resources
 
+Young, L. & Soroka, S. (2012). Affective News: The Automated Coding of Sentiment in Political Texts]. doi: 10.1080/10584609.2012.671234. Political Communication, 29(2), 205--231
+
+[Text Mining with R: A Tidy Approach](https://www.tidytextmining.com/index.html) 
+
+[Quanteda Tutorials](https://tutorials.quanteda.io/)

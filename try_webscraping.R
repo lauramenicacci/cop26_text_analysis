@@ -1,9 +1,6 @@
-##polite webscraping
+##polite webscraping part
 
-# criteria for polite code:
-# only download if file does not exist yet
-# pause between queries
-# stay identifiable with "From" header field
+#we did not use
 
 baseurl <- "https://www.theguardian.com/environment/cop26-glasgow-climate-change-conference-2021?page="
 pageurl <- paste0(seq(1, 33, 1))
@@ -23,17 +20,3 @@ for (i in 1:length(pages_list))  { if (!file.exists(paste0(folder, headlineslist
 }}
 
 list.files(folder, pattern = ".*",full.names = TRUE)
-
-
-#############
-
-for (pages_list in folder){
-  url_parsed <- read_html(pages_list)
-  
-  headings_nodes <- html_elements(url_parsed, xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "fc-date-headline", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "js-headline-text", " " ))]')
-  
-  headlines <- html_text2(headings_nodes)
-  headlineslist <- append(headlineslist, headlines)
-  #all_headlines <- append(all_headlines, headlineslist)
-}
-
