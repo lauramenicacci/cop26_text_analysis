@@ -30,7 +30,7 @@ Being a newspaper of the host country of the climate negotiation, the guardian w
 
 ```{r}
 if (!require("pacman")) install.packages("pacman")
-if (!require("phantomjs")) webshot::install_phantomjs()
+#if (!require("phantomjs")) webshot::install_phantomjs()
 pacman::p_load(tidyverse, 
                rvest, 
                stringr, 
@@ -73,7 +73,7 @@ words_list %>%
       head(10) %>% 
       kbl() %>% 
       kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, fixed_thead = T) %>% 
-      save_kable("FrequencyTable.html")
+      save_kable("3_1FrequencyTable.html")
 
 ```
 
@@ -84,7 +84,7 @@ words_list %>%
 par(mar=c(0.1,0.1,0.1,0.1))
 
 wordcloud(words_list$word, 
-          min.freq = 20, 
+          min.freq = 20,
           random.order = FALSE, 
           colors=brewer.pal(8, "Dark2"))
 
@@ -150,7 +150,7 @@ sentiment_complete %>% filter(sentiment != "neutral") %>%
                                     size = 0.3),
                          plot.background = element_rect(colour ="white"))
 
-ggsave("SentimentFrequencyPlot.png", width = 5, height = 3)
+ggsave("4_2SentimentFrequencyPlot.png", width = 5, height = 3)
 ```
 
 
@@ -177,7 +177,7 @@ sentiment_complete %>% filter(sentiment != "neutral") %>%
                                     size = 0.3),
         plot.background = element_rect(colour ="white"))
 
-ggsave("MostFrequentlyOccuringWord.png", width = 5, height = 3)
+ggsave("5_1MostFrequentlyOccuringWord.png", width = 5, height = 3)
 ```
 
 5.2. Summary Interactive Plots
@@ -217,7 +217,7 @@ sentiment_timeseries <- dygraph(timeseries, main = "All sentiments across time",
   dyHighlight(highlightCircleSize = 3, highlightSeriesBackgroundAlpha = 0.3, hideOnMouseOut = FALSE)  %>%
   dyRoller(rollPeriod = 1) 
 
-save_html(sentiment_timeseries, "./TimeSeriesofSentiment.html", libdir = "lib")
+save_html(sentiment_timeseries, "./5_2_2TimeSeriesofSentiment.html", libdir = "lib")
 
 ```
 
@@ -226,14 +226,16 @@ save_html(sentiment_timeseries, "./TimeSeriesofSentiment.html", libdir = "lib")
 ```{r}
 
 timeseries2<-cbind(negatives, positives)
-dygraph(timeseries2, main = "Positive and negative sentiments across time", xlab = "Date", ylab = "Frequency") %>%  #the plot, unfortunately, the dates are lost so far
+posnegtimeseries <- dygraph(timeseries2, main = "Positive and negative sentiments across time", xlab = "Date", ylab = "Frequency") %>% 
   dySeries("negatives", label="Negative") %>% 
-  dySeries("positives", label="Positive") %>% 
+  dySeries("positives", label="Positive") %>%
   dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.5, drawGrid = FALSE) %>%
   dyRangeSelector() %>%
   dyCrosshair(direction = "vertical") %>%
   dyHighlight(highlightCircleSize = 3, highlightSeriesBackgroundAlpha = 0.3, hideOnMouseOut = FALSE)  %>%
   dyRoller(rollPeriod = 1)
+
+save_html(posnegtimeseries, "./5_2_3TimeSeriesofPosNegSentiment.html", libdir = "lib")
 ```
 
 
@@ -273,39 +275,7 @@ sentiment %>%
                                     fill = NA,
                                     size = 0.3),
         plot.background = element_rect(colour ="white"))
-ggsave("DensityPlots.png", width = 5, height = 3)
-
-```
-
-```{r}
-# I kept these but we don't need them, 
-#sent_negative <- words_list %>% #we have 293 classified words, DO WE NEED THESE? THE NEGATIVES ONLY
- # filter(!word == "crisis") %>% #remove the word crisis before the sentiment analysis
-  #inner_join(get_sentiments("bing")) %>% 
-  #filter(sentiment=="negative")
-
-#sent_negative %>% 
- # count(Dates, sentiment) %>% 
-  #ggplot(aes(x=Dates, y=n)) +
-  #geom_line(color="red") +
-  #theme_minimal() +
-  #ylab("Frequency of Negative Words during COP26")+
-  #xlab("Date")
-
-
-
-
-#I kept the ggplot on case we will drop the interactive ones
-#sentiment_complete %>% 
- # drop_na() %>% 
-  #count(Dates, sentiment) %>% 
-  #group_by(sentiment) %>%
-  #ggplot(aes(Dates,y=n,color=sentiment)) +
-  #geom_line() +
-  #facet_wrap(~ sentiment, scales = "free_x") +
-  #theme_minimal() +
-  #ylab("Frequency of Negative Words during COP26")+
-  #xlab("Date")
+ggsave("6_1DensityPlots.png", width = 5, height = 3)
 
 ```
 
@@ -337,7 +307,8 @@ scatter_result<- plot_ly(counter_afinn, x = ~Dates, y = ~value, color = ~value, 
         type = 'scatter', mode = 'markers',
         marker = list(symbol = 'circle', sizemode = 'diameter',
                       line = list(width = 1, color = 'lightgrey')),
-        text = ~paste('Count of Words', n), alpha = 1.2) #setting interactions
+        text = ~paste('Count of Words', n), alpha = 1.2, #setting interactions
+        width = 750, height = 450) 
 
 
 scatter_result<-scatter_result %>% layout(title = 'AFINN Dictionary Results',
@@ -356,7 +327,7 @@ scatter_result<-scatter_result %>% layout(title = 'AFINN Dictionary Results',
          paper_bgcolor = 'rgb(255, 255, 255)',
          plot_bgcolor = 'rgb(255,255,255)')
 scatter_result
-
+htmlwidgets::saveWidget(partial_bundle(scatter_result), "6_2AffineAnalysisC26.html")
 
 ```
 
@@ -389,7 +360,8 @@ scatter_result_boris<- plot_ly(counter_boris_afinn, x = ~Dates, y = ~value, colo
         type = 'scatter', mode = 'markers',
         marker = list(symbol = 'circle', sizemode = 'diameter',
                       line = list(width = 1, color = 'lightgrey')),
-        text = ~paste('Count of Words', n), alpha = 1.2) #setting interactions
+        text = ~paste('Count of Words', n), alpha = 1.2,
+        width = 750, height = 450) #setting interactions
 
 
 scatter_result_boris<-scatter_result_boris %>% layout(title = 'AFINN Dictionary Results for Boris Headlines',
@@ -407,6 +379,8 @@ scatter_result_boris<-scatter_result_boris %>% layout(title = 'AFINN Dictionary 
          paper_bgcolor = 'rgb(255, 255, 255)',
          plot_bgcolor = 'rgb(255,255,255)')
 scatter_result_boris
+
+htmlwidgets::saveWidget(partial_bundle(scatter_result_boris), "6_3AffineAnalysisBoris.html")
 
 
 ```

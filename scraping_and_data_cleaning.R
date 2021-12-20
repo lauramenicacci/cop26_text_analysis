@@ -37,12 +37,12 @@ for (i in 1:length(headlineslist)){
   }
 }
 
+
 # First combining both our lists into a dataframe, such that each headline is associated with a date, and then removing all rows in which headlines = dates since we no longer need these for reference.  
 
 cop26 <- cbind(as.data.frame(headlineslist), as.data.frame(dateslist)) %>% 
   filter(headlineslist != dateslist) %>% 
   rename("Headlines" = "headlineslist", "Dates" = "dateslist")
-
 cop26$Dates<- as.Date(dmy(cop26$Dates) , format = "%d %B %Y")
 
 customized_stopwords<- add_row(stop_words , word= c("cop26", "glasgow","climate","change")) #crisis

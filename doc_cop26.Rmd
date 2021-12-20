@@ -86,6 +86,7 @@ Comment on wordcloud
 knitr::include_graphics("wordcloud.png")
 ```
 To see better: 
+
 ![FrequencyTable](./FrequencyTable.html)
 
 ### Keywords in context for the most frequent word
